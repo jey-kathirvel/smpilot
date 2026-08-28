@@ -14,6 +14,7 @@ from app.models.sprint import Sprint, SprintItem
 from app.models.user import User
 from app.services.authorization import get_project
 from app.services.sprint import recalculate_sprint, sprint_capacity
+from app.services.health import sprint_health
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -41,11 +42,12 @@ def sprint_page(request: Request, user: User = Depends(require_user), db: Sessio
     backlog = db.scalars(select(WorkItem).where(WorkItem.project_id == project.id, WorkItem.archived.is_(False), WorkItem.status.in_(["Backlog", "Ready"])).order_by(WorkItem.priority)).all()
     board = {column: [] for column in BOARD_COLUMNS}
     capacity = None
+    health = None
     if sprint:
-        recalculate_sprint(db, sprint); db.commit(); capacity = sprint_capacity(db, sprint)
+        recalculate_sprint(db, sprint); db.commit(); capacity = sprint_capacity(db, sprint); health = sprint_health(db, sprint)
         items = db.scalars(select(WorkItem).join(SprintItem, SprintItem.work_item_id == WorkItem.id).where(SprintItem.sprint_id == sprint.id, SprintItem.removed_at.is_(None))).all()
         for item in items: board[item.status if item.status in board else "Ready"].append(item)
-    return templates.TemplateResponse(request, "sprint.html", {"page_title": "Sprint", "show_nav": True, "user": user, "csrf_token": csrf_token(request), "project": project, "sprint": sprint, "backlog": backlog, "board": board, "columns": BOARD_COLUMNS, "capacity": capacity})
+    return templates.TemplateResponse(request, "sprint.html", {"page_title": "Sprint", "show_nav": True, "user": user, "csrf_token": csrf_token(request), "project": project, "sprint": sprint, "backlog": backlog, "board": board, "columns": BOARD_COLUMNS, "capacity": capacity, "health": health})
 
 
 @router.post("/sprint", include_in_schema=False)
