@@ -13,6 +13,7 @@ from app.logging import configure_logging
 from app.routers.auth import router as auth_router
 from app.routers.pages import router as pages_router
 from app.routers.organization import router as organization_router
+from app.routers.backlog import router as backlog_router
 
 configure_logging()
 logger = logging.getLogger(__name__)
@@ -32,6 +33,7 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 app.include_router(auth_router)
 app.include_router(organization_router)
+app.include_router(backlog_router)
 app.include_router(pages_router)
 
 
