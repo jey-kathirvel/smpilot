@@ -66,8 +66,21 @@ app.include_router(pages_router)
 @app.middleware("http")
 async def request_logging(request: Request, call_next):
     request_id = request.headers.get("x-request-id", str(uuid.uuid4()))
+    try:
+        content_length = int(request.headers.get("content-length", "0") or 0)
+    except ValueError:
+        return JSONResponse({"detail": "Invalid Content-Length"}, status_code=400)
+    if content_length > 1_048_576:
+        return JSONResponse({"detail": "Request body too large"}, status_code=413)
     response = await call_next(request)
     response.headers["x-request-id"] = request_id
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    response.headers["Content-Security-Policy"] = "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+    if settings.is_production:
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     logger.info(
         "request_completed",
         extra={"request_id": request_id},

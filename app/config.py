@@ -25,6 +25,8 @@ class Settings(BaseSettings):
     openrouter_model: str = "openrouter/free"
     openai_api_key: str = Field(default="", repr=False)
     openai_model: str = "gpt-5-mini"
+    ai_rate_limit_requests: int = 20
+    ai_rate_limit_window_seconds: int = 60
     smtp_host: str = ""
     smtp_port: int = 587
     smtp_username: str = ""
@@ -48,8 +50,8 @@ class Settings(BaseSettings):
         return "https://openrouter.ai/api/v1" if self.ai_provider == "openrouter" else None
 
     def validate_production_security(self) -> None:
-        if self.is_production and self.session_secret == "development-only-change-me":
-            raise RuntimeError("SESSION_SECRET must be configured in production")
+        if self.is_production and (self.session_secret == "development-only-change-me" or len(self.session_secret) < 32):
+            raise RuntimeError("SESSION_SECRET must be configured with at least 32 characters in production")
 
 
 @lru_cache

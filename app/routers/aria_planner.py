@@ -12,6 +12,7 @@ from app.ai.planner import deterministic_sprint_plan
 from app.ai.prompts import PROMPT_VERSIONS
 from app.ai.schemas import SprintPlanRecommendation
 from app.ai.service import AriaService
+from app.ai.rate_limit import enforce_ai_rate_limit
 from app.auth.dependencies import csrf_token, require_user, validate_csrf
 from app.config import get_settings
 from app.database import get_db
@@ -45,10 +46,11 @@ def planning_page(request: Request, user: User = Depends(require_user), db: Sess
 @router.post("/sprint/{sprint_id}/aria-plan", include_in_schema=False)
 def generate_plan(request: Request, sprint_id: str, csrf: str = Form(), user: User = Depends(require_user), db: Session = Depends(get_db)):
     validate_csrf(request, csrf); project, sprint = planning_context(request, db, user)
+    settings = get_settings(); enforce_ai_rate_limit(f"{user.id}:sprint_planner", requests=settings.ai_rate_limit_requests, window_seconds=settings.ai_rate_limit_window_seconds)
     if str(sprint.id) != sprint_id: raise HTTPException(403)
     context = build_project_context(db, project)
     context["planning_request"] = {"sprint": build_project_context(db, project, sprint)["sprint"], "capacity": sprint_capacity(db, sprint), "instruction": "Recommend sprint scope; never apply changes."}
-    service = AriaService(get_settings())
+    service = AriaService(settings)
     result = service.run(db, feature="sprint_planner", project_id=project.id, sprint_id=sprint.id, prompt_version=PROMPT_VERSIONS["sprint_planner"], context=context, schema=SprintPlanRecommendation, fallback=lambda: deterministic_sprint_plan(db, sprint))
     db.add(SprintPlan(project_id=project.id, sprint_id=sprint.id, generated_by_user_id=user.id, recommendation=result.model_dump(mode="json"), status="Suggested")); db.commit()
     return RedirectResponse("/sprint/planning", status_code=303)

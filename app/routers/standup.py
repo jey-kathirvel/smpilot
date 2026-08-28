@@ -10,6 +10,7 @@ from app.ai.context import build_project_context
 from app.ai.prompts import ARIA_SYSTEM_PROMPT
 from app.ai.schemas import DailyScrumSummary
 from app.ai.service import AriaService
+from app.ai.rate_limit import enforce_ai_rate_limit
 from app.auth.dependencies import csrf_token, require_user, validate_csrf
 from app.config import get_settings
 from app.database import get_db
@@ -59,7 +60,8 @@ def submit_update(request: Request, yesterday: str = Form(), today: str = Form()
 @router.post("/standup/summary", include_in_schema=False)
 def generate_summary(request: Request, csrf: str = Form(), user: User = Depends(require_user), db: Session = Depends(get_db)):
     validate_csrf(request, csrf); project, sprint = context(request, db, user); day = date.today()
-    service = AriaService(get_settings())
+    settings = get_settings(); enforce_ai_rate_limit(f"{user.id}:daily_scrum", requests=settings.ai_rate_limit_requests, window_seconds=settings.ai_rate_limit_window_seconds)
+    service = AriaService(settings)
     result = service.run(db, feature="daily_scrum", project_id=project.id, sprint_id=sprint.id if sprint else None, prompt_version="daily-scrum-v1", context={"project": build_project_context(db, project, sprint), "updates": [u.__dict__ for u in db.scalars(select(DailyStandup).where(DailyStandup.project_id == project.id, DailyStandup.update_date == day)).all()]}, schema=DailyScrumSummary, fallback=lambda: deterministic_daily_summary(db, project.id, day))
     saved = db.scalar(select(DailyStandupSummary).where(DailyStandupSummary.project_id == project.id, DailyStandupSummary.summary_date == day))
     if not saved: saved = DailyStandupSummary(project_id=project.id, sprint_id=sprint.id if sprint else None, summary_date=day, analysis=result.model_dump(mode="json")); db.add(saved)
