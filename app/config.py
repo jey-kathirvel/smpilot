@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     app_base_url: str = "http://localhost:8000"
     database_url: str = "postgresql+psycopg://smpilot:smpilot@localhost/smpilot"
     session_secret: str = Field(default="development-only-change-me", repr=False)
+    session_cookie_name: str = "smpilot_session"
+    session_max_age: int = 60 * 60 * 24 * 14
+    password_reset_minutes: int = 30
     openai_api_key: str = Field(default="", repr=False)
     openai_model: str = "gpt-5-mini"
     smtp_host: str = ""
@@ -28,6 +31,10 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.app_env.lower() == "production"
+
+    def validate_production_security(self) -> None:
+        if self.is_production and self.session_secret == "development-only-change-me":
+            raise RuntimeError("SESSION_SECRET must be configured in production")
 
 
 @lru_cache

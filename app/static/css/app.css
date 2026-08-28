@@ -28,7 +28,7 @@ a { color: #086da8; font-weight: 700; }
 .primary-nav .aria-link { color:#e9d5ff; }
 .header-actions { display:flex; align-items:center; gap:.65rem; }
 .icon-button { width:2.5rem; min-height:2.5rem; padding:0; border:1px solid rgba(255,255,255,.22); border-radius:50%; color:#7dd3fc; background:rgba(255,255,255,.08); }
-.avatar { display:grid; place-items:center; width:2.5rem; height:2.5rem; border-radius:50%; color:var(--navy); background:#bae6fd; font-size:.8rem; font-weight:800; }
+.avatar { display:grid; place-items:center; width:2.5rem; height:2.5rem; border-radius:50%; color:var(--navy); background:#bae6fd; font-size:.8rem; font-weight:800; text-decoration:none; }
 .nav-toggle { display:none; width:2.75rem; min-height:2.75rem; padding:.65rem; background:transparent; border:1px solid rgba(255,255,255,.25); }
 .nav-toggle span:not(.sr-only) { display:block; height:2px; margin:4px 0; background:white; }
 .app-shell { width:min(100%,90rem); min-height:calc(100vh - 4.5rem); margin:auto; padding:clamp(1rem,4vw,3rem); }
@@ -76,6 +76,12 @@ th { color:var(--gray); background:#f3f9fc; font-size:.78rem; letter-spacing:.04
 .modal-backdrop { position:fixed; inset:0; z-index:40; display:grid; place-items:center; padding:1rem; background:rgba(8,47,73,.58); }
 .modal { width:min(100%,34rem); max-height:calc(100vh - 2rem); overflow:auto; padding:1.5rem; border-radius:1.25rem; background:white; box-shadow:0 2rem 5rem rgba(0,0,0,.25); }
 .ai-recommendation { padding:1rem; border:1px solid #d9c7ff; border-left:4px solid var(--purple); border-radius:.85rem; background:linear-gradient(120deg,#faf7ff,#f1eaff); }
+.settings-card { width:min(100%,42rem); margin:0 auto; }
+.button-row { display:flex; flex-wrap:wrap; gap:.75rem; }
+.button-row button { flex:1 1 10rem; }
+.secondary-button { display:grid; place-items:center; border:1px solid var(--blue); color:var(--blue-dark); background:white; text-decoration:none; }
+.danger-button { color:white; background:var(--red); }
+.alert ul { margin:.25rem 0; padding-left:1.25rem; }
 @keyframes shimmer { to { background-position:-200% 0; } }
 
 @media (max-width: 1024px) { .metric-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .primary-nav a { padding:.55rem .5rem; } }

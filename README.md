@@ -82,6 +82,11 @@ Runtime settings are loaded from environment variables. See `.env.example` for
 application, PostgreSQL, session, OpenAI, and SMTP settings. OpenAI and SMTP are
 optional for the initial foundation.
 
+Authentication uses signed, HttpOnly, SameSite session cookies and Argon2
+password hashing. In production, `SESSION_SECRET` is mandatory and cookies are
+marked Secure. Configure the SMTP variables to deliver password-reset links;
+reset requests return the same response whether or not an account exists.
+
 ## Project structure
 
 - `app/`: FastAPI application, routes, templates, static assets, and services

@@ -2,22 +2,34 @@ import logging
 import uuid
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException
+from starlette.middleware.sessions import SessionMiddleware
 
 from app.config import get_settings
 from app.logging import configure_logging
+from app.routers.auth import router as auth_router
 from app.routers.pages import router as pages_router
 
 configure_logging()
 logger = logging.getLogger(__name__)
 settings = get_settings()
+settings.validate_production_security()
 templates = Jinja2Templates(directory="app/templates")
 
 app = FastAPI(title=settings.app_name, debug=settings.app_debug and not settings.is_production)
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=settings.session_secret,
+    session_cookie=settings.session_cookie_name,
+    max_age=settings.session_max_age,
+    same_site="lax",
+    https_only=settings.is_production,
+)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.include_router(auth_router)
 app.include_router(pages_router)
 
 
@@ -44,6 +56,8 @@ async def health() -> dict[str, str]:
 
 @app.exception_handler(HTTPException)
 async def http_error(request: Request, exc: HTTPException):
+    if exc.status_code == 401:
+        return RedirectResponse("/login", status_code=303)
     if exc.status_code in {403, 404}:
         return templates.TemplateResponse(
             request,

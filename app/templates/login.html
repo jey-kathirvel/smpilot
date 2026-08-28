@@ -4,11 +4,16 @@
   <p class="eyebrow">SMPilot AI</p>
   <h1>Welcome back</h1>
   <p>Log in to continue with Aria, your autonomous AI Scrum Master.</p>
-  <form>
-    <label>Email<input type="email" name="email" autocomplete="email" required></label>
+  {% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
+  {% if request.query_params.get('reset') == 'success' %}<div class="alert alert-info" role="status">Password reset. You can now log in.</div>{% endif %}
+  {% if request.query_params.get('changed') == 'success' %}<div class="alert alert-info" role="status">Password changed. Please log in again.</div>{% endif %}
+  <form method="post" action="/login">
+    <input type="hidden" name="csrf" value="{{ csrf_token }}">
+    <label>Email<input type="email" name="email" value="{{ email|default('') }}" autocomplete="email" required></label>
     <label>Password<input type="password" name="password" autocomplete="current-password" required></label>
     <button type="submit">Log in</button>
   </form>
+  <p class="form-note"><a href="/forgot-password">Forgot password?</a></p>
   <p class="form-note">New to SMPilot? <a href="/signup">Create an account</a></p>
 </section>
 {% endblock %}

@@ -28,11 +28,9 @@ def test_signup_page() -> None:
 
 
 def test_today_shell() -> None:
-    response = client.get("/today")
-    assert response.status_code == 200
-    for label in ("Today", "Sprint", "Backlog", "Team", "Aria", "Insights", "Settings"):
-        assert label in response.text
-    assert 'aria-controls="primary-nav"' in response.text
+    response = client.get("/today", follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers["location"] == "/login"
 
 
 def test_unknown_page_uses_friendly_404() -> None:
