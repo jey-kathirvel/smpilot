@@ -35,7 +35,7 @@ def create_password_reset(db: Session, user: User, minutes: int) -> str:
     return raw_token
 
 
-def consume_password_reset(db: Session, raw_token: str, new_password: str) -> User | None:
+def consume_password_reset(db: Session, raw_token: str, new_password: str, email: str | None = None) -> User | None:
     token = db.scalar(select(PasswordResetToken).where(PasswordResetToken.token_hash == token_digest(raw_token)))
     now = datetime.now(UTC)
     if not token or token.used_at is not None:
@@ -44,6 +44,8 @@ def consume_password_reset(db: Session, raw_token: str, new_password: str) -> Us
     if expires_at <= now:
         return None
     user = token.user
+    if email and user.email != normalize_email(email):
+        return None
     user.password_hash = hash_password(new_password)
     user.session_version += 1
     token.used_at = now
@@ -51,7 +53,7 @@ def consume_password_reset(db: Session, raw_token: str, new_password: str) -> Us
     return user
 
 
-def send_password_reset(settings: Settings, recipient: str, reset_url: str) -> bool:
+def send_password_reset(settings: Settings, recipient: str, reset_url: str, reset_code: str) -> bool:
     if not settings.smtp_host or not settings.smtp_from:
         logger.warning("password_reset_email_not_sent_smtp_unconfigured")
         return False
@@ -59,7 +61,7 @@ def send_password_reset(settings: Settings, recipient: str, reset_url: str) -> b
     message["Subject"] = "Reset your SMPilot AI password"
     message["From"] = settings.smtp_from
     message["To"] = recipient
-    message.set_content(f"Use this link within {settings.password_reset_minutes} minutes to reset your password:\n\n{reset_url}")
+    message.set_content(f"Open the password reset page and enter the code below within {settings.password_reset_minutes} minutes.\n\nReset page: {reset_url}\n\nOne-time code: {reset_code}")
     with smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=15) as smtp:
         smtp.starttls()
         if settings.smtp_username:

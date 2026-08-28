@@ -94,29 +94,29 @@ async def forgot_password(request: Request, email: str = Form(), csrf: str = For
     user = db.scalar(select(User).where(User.email == normalize_email(email)))
     if user:
         token = create_password_reset(db, user, settings.password_reset_minutes)
-        reset_url = f"{settings.app_base_url.rstrip('/')}/reset-password/{token}"
+        reset_url = f"{settings.app_base_url.rstrip('/')}/reset-password"
         try:
-            send_password_reset(settings, user.email, reset_url)
+            send_password_reset(settings, user.email, reset_url, token)
         except Exception:
             logger.exception("password_reset_email_failed")
     return render(request, "forgot_password.html", page_title="Forgot password", success="If that account exists, password reset instructions have been sent.")
 
 
-@router.get("/reset-password/{token}", include_in_schema=False)
-async def reset_password_page(request: Request, token: str):
-    return render(request, "reset_password.html", page_title="Reset password", token=token)
+@router.get("/reset-password", include_in_schema=False)
+async def reset_password_page(request: Request):
+    return render(request, "reset_password.html", page_title="Reset password")
 
 
-@router.post("/reset-password/{token}", include_in_schema=False)
-async def reset_password(request: Request, token: str, password: str = Form(), confirm_password: str = Form(), csrf: str = Form(), db: Session = Depends(get_db)):
+@router.post("/reset-password", include_in_schema=False)
+async def reset_password(request: Request, email: str = Form(), reset_code: str = Form(), password: str = Form(), confirm_password: str = Form(), csrf: str = Form(), db: Session = Depends(get_db)):
     validate_csrf(request, csrf)
     errors = validate_password(password)
     if password != confirm_password:
         errors.append("Passwords do not match.")
     if errors:
-        return render(request, "reset_password.html", page_title="Reset password", token=token, errors=errors, status_code=400)
-    if not consume_password_reset(db, token, password):
-        return render(request, "reset_password.html", page_title="Reset password", token=token, errors=["This reset link is invalid or expired."], status_code=400)
+        return render(request, "reset_password.html", page_title="Reset password", email=email, errors=errors, status_code=400)
+    if not consume_password_reset(db, reset_code.strip(), password, email):
+        return render(request, "reset_password.html", page_title="Reset password", email=email, errors=["This reset code is invalid or expired."], status_code=400)
     request.session.clear()
     return RedirectResponse("/login?reset=success", status_code=status.HTTP_303_SEE_OTHER)
 

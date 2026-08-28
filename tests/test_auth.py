@@ -102,8 +102,8 @@ def test_password_reset_invalidates_existing_session(client: TestClient) -> None
         token = create_password_reset(db, user, 30)
     reset_client = TestClient(app)
     response = reset_client.post(
-        f"/reset-password/{token}",
-        data={"csrf": csrf(reset_client, f"/reset-password/{token}"), "password": "NewSecurePass456", "confirm_password": "NewSecurePass456"},
+        "/reset-password",
+        data={"csrf": csrf(reset_client, "/reset-password"), "email": "aria@example.com", "reset_code": token, "password": "NewSecurePass456", "confirm_password": "NewSecurePass456"},
         follow_redirects=False,
     )
     assert response.status_code == 303
