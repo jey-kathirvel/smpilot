@@ -2,7 +2,7 @@ import logging
 import uuid
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.exceptions import HTTPException
@@ -39,6 +39,16 @@ app.add_middleware(
     https_only=settings.is_production,
 )
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
+
+
+@app.get("/service-worker.js", include_in_schema=False)
+def service_worker():
+    return FileResponse(
+        "app/static/service-worker.js",
+        media_type="application/javascript",
+        headers={"Service-Worker-Allowed": "/", "Cache-Control": "no-cache"},
+    )
+
 app.include_router(auth_router)
 app.include_router(organization_router)
 app.include_router(backlog_router)
