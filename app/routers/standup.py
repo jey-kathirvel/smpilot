@@ -18,9 +18,15 @@ from app.models.standup import DailyStandup, DailyStandupSummary
 from app.models.user import User
 from app.services.authorization import get_project
 from app.services.standup import deterministic_daily_summary
+from app.services.meeting import meeting_recommendation
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
+
+@router.get("/standup/meeting", include_in_schema=False)
+def meeting_page(request: Request, user: User = Depends(require_user), db: Session = Depends(get_db)):
+    project, sprint = context(request, db, user); recommendation = meeting_recommendation(db, project.id, sprint)
+    return templates.TemplateResponse(request, "meeting_recommendation.html", {"page_title": "Meeting Recommendation", "show_nav": True, "user": user, "csrf_token": csrf_token(request), "meeting": recommendation})
 
 
 def context(request, db, user):
