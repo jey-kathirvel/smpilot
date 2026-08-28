@@ -20,6 +20,7 @@ from app.routers.standup import router as standup_router
 from app.routers.aria_actions import router as aria_actions_router
 from app.routers.aria_chat import router as aria_chat_router
 from app.routers.retro import router as retro_router
+from app.routers.insights import router as insights_router
 
 configure_logging()
 logger = logging.getLogger(__name__)
@@ -46,6 +47,7 @@ app.include_router(standup_router)
 app.include_router(aria_actions_router)
 app.include_router(aria_chat_router)
 app.include_router(retro_router)
+app.include_router(insights_router)
 app.include_router(pages_router)
 
 

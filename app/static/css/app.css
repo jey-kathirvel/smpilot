@@ -140,3 +140,5 @@ fieldset { border:1px solid var(--border); border-radius:.75rem; padding:.75rem;
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration:.01ms!important; animation-iteration-count:1!important; scroll-behavior:auto!important; } }
 .risk-item { border-left:3px solid var(--warning); padding:.65rem 0 .65rem 1rem; margin:.7rem 0; }
 .risk-item p,.risk-item ul { margin:.35rem 0; }
+.simple-chart{display:grid;gap:.8rem}.chart-row{display:grid;grid-template-columns:minmax(5rem,1fr) 3fr auto;gap:.7rem;align-items:center}.chart-row div{display:grid;gap:.2rem}.chart-row i,.chart-row b{display:block;height:.55rem;border-radius:1rem}.chart-row i{background:var(--border)}.chart-row b{background:var(--primary)}
+@media(max-width:600px){.chart-row{grid-template-columns:1fr}.chart-row small{justify-self:end}}
