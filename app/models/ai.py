@@ -44,3 +44,7 @@ class AriaAction(Base):
     created_by_user_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     approved_by_user_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"), nullable=True); approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     executed_by_user_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"), nullable=True); executed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True)); result: Mapped[str | None] = mapped_column(String(2000)); expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True)); created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+class AriaMessage(Base):
+    __tablename__="aria_messages"
+    id:Mapped[uuid.UUID]=mapped_column(Uuid,primary_key=True,default=uuid.uuid4); project_id:Mapped[uuid.UUID]=mapped_column(Uuid,ForeignKey("projects.id",ondelete="CASCADE"),index=True); user_id:Mapped[uuid.UUID]=mapped_column(Uuid,ForeignKey("users.id",ondelete="CASCADE"),index=True); role:Mapped[str]=mapped_column(String(20)); content:Mapped[str]=mapped_column(String(4000)); facts:Mapped[dict|None]=mapped_column(JSON,nullable=True); created_at:Mapped[datetime]=mapped_column(DateTime(timezone=True),default=utcnow)

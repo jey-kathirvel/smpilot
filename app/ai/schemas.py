@@ -45,3 +45,9 @@ class DailyScrumSummary(BaseModel):
     coordination_needed: list[str] = []
     follow_up_suggestions: list[str] = []
     confidence: float = Field(ge=0, le=1)
+
+class AriaAnswer(BaseModel):
+    answer: str
+    supporting_facts: list[str] = []
+    recommended_action: str | None = None
+    confidence: float = Field(ge=0, le=1)
