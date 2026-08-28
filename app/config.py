@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     session_cookie_name: str = "smpilot_session"
     session_max_age: int = 60 * 60 * 24 * 14
     password_reset_minutes: int = 30
+    ai_provider: str = "openrouter"
+    openrouter_api_key: str = Field(default="", repr=False)
+    openrouter_model: str = "openrouter/free"
     openai_api_key: str = Field(default="", repr=False)
     openai_model: str = "gpt-5-mini"
     smtp_host: str = ""
@@ -31,6 +34,18 @@ class Settings(BaseSettings):
     @property
     def is_production(self) -> bool:
         return self.app_env.lower() == "production"
+
+    @property
+    def ai_api_key(self) -> str:
+        return self.openrouter_api_key if self.ai_provider == "openrouter" else self.openai_api_key
+
+    @property
+    def ai_model(self) -> str:
+        return self.openrouter_model if self.ai_provider == "openrouter" else self.openai_model
+
+    @property
+    def ai_base_url(self) -> str | None:
+        return "https://openrouter.ai/api/v1" if self.ai_provider == "openrouter" else None
 
     def validate_production_security(self) -> None:
         if self.is_production and self.session_secret == "development-only-change-me":

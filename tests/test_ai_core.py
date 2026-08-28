@@ -64,3 +64,10 @@ def test_context_never_includes_another_project() -> None:
         context = build_project_context(db, first)
         assert context["project"]["id"] == str(first.id)
         assert context["project"]["id"] != str(second.id)
+
+
+def test_openrouter_free_is_the_default_ai_route() -> None:
+    settings = Settings(_env_file=None)
+    assert settings.ai_provider == "openrouter"
+    assert settings.ai_model == "openrouter/free"
+    assert settings.ai_base_url == "https://openrouter.ai/api/v1"
