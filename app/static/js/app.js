@@ -8,3 +8,16 @@ if (navToggle && primaryNav) {
     primaryNav.classList.toggle('is-open', !isOpen);
   });
 }
+
+const notificationCount = document.querySelector('.notification-count');
+if (notificationCount) {
+  fetch('/notifications/unread-count', { headers: { Accept: 'application/json' } })
+    .then((response) => response.ok ? response.json() : null)
+    .then((data) => {
+      if (data && data.count > 0) {
+        notificationCount.textContent = data.count > 99 ? '99+' : String(data.count);
+        notificationCount.hidden = false;
+      }
+    })
+    .catch(() => {});
+}
