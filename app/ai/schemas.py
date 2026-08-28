@@ -17,3 +17,18 @@ class AriaResponse(BaseModel):
     recommendations: list[str] = []
     requires_human_approval: bool = False
     metadata: dict[str, Any] = {}
+
+
+class SprintPlanRecommendation(BaseModel):
+    sprint_goal: str
+    recommended_story_ids: list[str]
+    recommended_story_keys: list[str]
+    expected_story_points: int = Field(ge=0)
+    capacity_utilization: float = Field(ge=0)
+    dependencies: list[str] = []
+    risks: list[str] = []
+    stories_requiring_refinement: list[str] = []
+    stories_likely_too_large: list[str] = []
+    rationale: str
+    confidence: float = Field(ge=0, le=1)
+    requires_human_approval: bool = True

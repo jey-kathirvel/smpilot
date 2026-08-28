@@ -108,6 +108,14 @@ fieldset { border:1px solid var(--border); border-radius:.75rem; padding:.75rem;
 .board-card p { margin:.35rem 0; }
 .board-card form { gap:.5rem; margin-top:.75rem; }
 .complete-panel { margin-top:1rem; }
+.plan-brief { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin-bottom:1rem; }
+.plan-brief form { margin:0; }
+.aria-plan { margin-bottom:1rem; }
+.chip-row { display:flex; flex-wrap:wrap; gap:.5rem; }
+.plan-columns,.decision-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.decision-grid { grid-template-columns:auto minmax(18rem,1fr) auto; align-items:start; padding-top:1rem; border-top:1px solid var(--border); }
+.decision-grid form { margin:0; }
+@media(max-width:768px){.plan-brief{align-items:flex-start;flex-direction:column}.plan-columns,.decision-grid{grid-template-columns:1fr}}
 @keyframes shimmer { to { background-position:-200% 0; } }
 
 @media (max-width: 1024px) { .metric-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .primary-nav a { padding:.55rem .5rem; } }

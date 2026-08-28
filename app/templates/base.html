@@ -13,7 +13,7 @@
     <a class="brand" href="/today" aria-label="SMPilot AI home"><span class="brand-mark">S</span><span>SMPilot <strong>AI</strong></span></a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav"><span class="sr-only">Toggle navigation</span><span></span><span></span><span></span></button>
     <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation">
-      <a class="active" href="/today">Today</a><a href="#">Sprint</a><a href="#">Backlog</a><a href="#">Team</a><a class="aria-link" href="#">Aria</a><a href="#">Insights</a><a href="#">Settings</a>
+      <a class="active" href="/today">Today</a><a href="/sprint">Sprint</a><a href="/backlog">Backlog</a><a href="/team">Team</a><a class="aria-link" href="/sprint/planning">Aria</a><a href="#">Insights</a><a href="/settings/workspace">Settings</a>
     </nav>
     <div class="header-actions"><button class="icon-button" aria-label="Notifications">●</button>{% if user %}<a class="avatar" href="/profile" aria-label="User profile">{{ user.full_name[:2]|upper }}</a>{% else %}<span class="avatar" aria-label="User profile">SP</span>{% endif %}</div>
   </header>
