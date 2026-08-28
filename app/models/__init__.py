@@ -5,6 +5,6 @@ from app.models.organization import Project, TeamMember, Workspace, WorkspaceMem
 from app.models.backlog import WorkItem, WorkItemDependency
 from app.models.sprint import Sprint, SprintItem
 from app.models.standup import DailyStandup, DailyStandupSummary
-from app.models.ai import AIAuditLog, SprintPlan
+from app.models.ai import AIAuditLog, AriaAction, SprintPlan
 
 __all__ = ["AIAuditLog", "PasswordResetToken", "Project", "Sprint", "SprintItem", "SprintPlan", "TeamMember", "User", "Workspace", "WorkspaceMember", "WorkItem", "WorkItemDependency"]

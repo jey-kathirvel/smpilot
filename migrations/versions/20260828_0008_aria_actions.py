@@ -1,0 +1,7 @@
+"""Add Aria action center."""
+from alembic import op
+import sqlalchemy as sa
+revision="20260828_0008"; down_revision="20260828_0007"; branch_labels=None; depends_on=None
+def upgrade():
+    op.create_table("aria_actions",sa.Column("id",sa.Uuid(),primary_key=True),sa.Column("project_id",sa.Uuid(),sa.ForeignKey("projects.id",ondelete="CASCADE"),nullable=False),sa.Column("sprint_id",sa.Uuid(),sa.ForeignKey("sprints.id",ondelete="SET NULL")),sa.Column("action_type",sa.String(80),nullable=False),sa.Column("title",sa.String(240),nullable=False),sa.Column("description",sa.String(2000),nullable=False),sa.Column("status",sa.String(30),nullable=False),sa.Column("consequential",sa.Boolean(),nullable=False),sa.Column("created_by_user_id",sa.Uuid(),sa.ForeignKey("users.id",ondelete="SET NULL")),sa.Column("approved_by_user_id",sa.Uuid(),sa.ForeignKey("users.id",ondelete="SET NULL")),sa.Column("approved_at",sa.DateTime(timezone=True)),sa.Column("executed_by_user_id",sa.Uuid(),sa.ForeignKey("users.id",ondelete="SET NULL")),sa.Column("executed_at",sa.DateTime(timezone=True)),sa.Column("result",sa.String(2000)),sa.Column("expires_at",sa.DateTime(timezone=True)),sa.Column("created_at",sa.DateTime(timezone=True),nullable=False)); op.create_index("ix_aria_actions_project_id","aria_actions",["project_id"]); op.create_index("ix_aria_actions_sprint_id","aria_actions",["sprint_id"])
+def downgrade(): op.drop_table("aria_actions")

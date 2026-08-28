@@ -32,3 +32,15 @@ class SprintPlan(Base):
     status: Mapped[str] = mapped_column(String(30), default="Suggested")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     decided_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class AriaAction(Base):
+    __tablename__ = "aria_actions"
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    project_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("projects.id", ondelete="CASCADE"), index=True)
+    sprint_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("sprints.id", ondelete="SET NULL"), nullable=True, index=True)
+    action_type: Mapped[str] = mapped_column(String(80)); title: Mapped[str] = mapped_column(String(240)); description: Mapped[str] = mapped_column(String(2000))
+    status: Mapped[str] = mapped_column(String(30), default="Suggested"); consequential: Mapped[bool] = mapped_column(default=False)
+    created_by_user_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    approved_by_user_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"), nullable=True); approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    executed_by_user_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, ForeignKey("users.id", ondelete="SET NULL"), nullable=True); executed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True)); result: Mapped[str | None] = mapped_column(String(2000)); expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True)); created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
