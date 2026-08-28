@@ -13,6 +13,7 @@ from app.models.standup import DailyStandup
 from app.services.authorization import get_project
 from app.services.sprint import recalculate_sprint
 from app.services.health import sprint_health
+from app.services.risks import sprint_risks
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -41,7 +42,8 @@ async def today_page(request: Request, user: User = Depends(require_user), db: S
         total_days = max(1, (sprint.end_date - sprint.start_date).days + 1); sprint_day = min(total_days, max(1, (date.today() - sprint.start_date).days + 1))
         completion = round(sprint.completed_points / sprint.planned_points * 100) if sprint.planned_points else 0
         health = sprint_health(db, sprint)
-        dashboard = {"sprint_day": sprint_day, "total_days": total_days, "completion": completion, "remaining_points": max(0, sprint.planned_points - sprint.completed_points), "blockers": blockers, "stale": stale, "missing": missing, "health": health["status"], "health_report": health, "forecast": "Likely to complete" if health["status"] == "ON_TRACK" else "Delivery needs attention", "attention_count": len(blockers) + len(stale) + len(missing)}
+        risks = sprint_risks(db, sprint)
+        dashboard = {"sprint_day": sprint_day, "total_days": total_days, "completion": completion, "remaining_points": max(0, sprint.planned_points - sprint.completed_points), "blockers": blockers, "stale": stale, "missing": missing, "health": health["status"], "health_report": health, "risks": risks, "forecast": "Likely to complete" if health["status"] == "ON_TRACK" else "Delivery needs attention", "attention_count": len(blockers) + len(stale) + len(missing) + len(risks)}
     return templates.TemplateResponse(
         request,
         "today.html",

@@ -138,3 +138,5 @@ fieldset { border:1px solid var(--border); border-radius:.75rem; padding:.75rem;
   .header-actions .icon-button { display:none; }
 }
 @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation-duration:.01ms!important; animation-iteration-count:1!important; scroll-behavior:auto!important; } }
+.risk-item { border-left:3px solid var(--warning); padding:.65rem 0 .65rem 1rem; margin:.7rem 0; }
+.risk-item p,.risk-item ul { margin:.35rem 0; }
