@@ -15,7 +15,7 @@
     <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation">
       <a class="active" href="/today">Today</a><a href="/standup">Stand-up</a><a href="/sprint">Sprint</a><a href="/backlog">Backlog</a><a href="/team">Team</a><a class="aria-link" href="/aria">Ask Aria</a><a href="/insights">Insights</a><a href="/settings/workspace">Settings</a>
     </nav>
-    <div class="header-actions"><a class="icon-button notification-link" href="/notifications" aria-label="Notifications"><span aria-hidden="true">N</span><span class="notification-count" hidden>0</span></a>{% if user %}<a class="avatar" href="/profile" aria-label="User profile">{{ user.full_name[:2]|upper }}</a>{% else %}<span class="avatar" aria-label="User profile">SP</span>{% endif %}</div>
+    <div class="header-actions">{% include "_aria_identity.html" %}<a class="icon-button notification-link" href="/notifications" aria-label="Notifications"><span aria-hidden="true">N</span><span class="notification-count" hidden>0</span></a>{% if user %}<a class="avatar" href="/profile" aria-label="User profile">{{ user.full_name[:2]|upper }}</a>{% else %}<span class="avatar" aria-label="User profile">SP</span>{% endif %}</div>
   </header>
   {% endif %}
   <main id="main-content" class="{% if show_nav %}app-shell{% else %}page-shell{% endif %}">
