@@ -32,3 +32,16 @@ class SprintPlanRecommendation(BaseModel):
     rationale: str
     confidence: float = Field(ge=0, le=1)
     requires_human_approval: bool = True
+
+
+class DailyScrumSummary(BaseModel):
+    team_summary: str
+    accomplishments: list[str] = []
+    todays_focus: list[str] = []
+    blockers: list[str] = []
+    emerging_dependencies: list[str] = []
+    missing_updates: list[str] = []
+    stale_stories: list[str] = []
+    coordination_needed: list[str] = []
+    follow_up_suggestions: list[str] = []
+    confidence: float = Field(ge=0, le=1)

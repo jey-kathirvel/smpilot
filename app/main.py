@@ -16,6 +16,7 @@ from app.routers.organization import router as organization_router
 from app.routers.backlog import router as backlog_router
 from app.routers.sprint import router as sprint_router
 from app.routers.aria_planner import router as aria_planner_router
+from app.routers.standup import router as standup_router
 
 configure_logging()
 logger = logging.getLogger(__name__)
@@ -38,6 +39,7 @@ app.include_router(organization_router)
 app.include_router(backlog_router)
 app.include_router(sprint_router)
 app.include_router(aria_planner_router)
+app.include_router(standup_router)
 app.include_router(pages_router)
 
 
