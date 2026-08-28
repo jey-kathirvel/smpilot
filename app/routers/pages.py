@@ -19,3 +19,10 @@ async def login_page(request: Request):
 @router.get("/signup", include_in_schema=False)
 async def signup_page(request: Request):
     return templates.TemplateResponse(request, "signup.html", {"page_title": "Sign up"})
+
+
+@router.get("/today", include_in_schema=False)
+async def today_page(request: Request):
+    return templates.TemplateResponse(
+        request, "today.html", {"page_title": "Today", "show_nav": True}
+    )

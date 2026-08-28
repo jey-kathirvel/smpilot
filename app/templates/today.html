@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero-panel glass-panel">
+  <div><p class="eyebrow">Aria Morning Brief</p><h1>Good morning</h1><p>Aria is ready to review your sprint and surface what needs attention today.</p></div>
+  <span class="status-chip status-on-track"><span></span>On Track</span>
+</section>
+<section class="metric-grid" aria-label="Sprint summary">
+  <article class="card metric-card"><span class="metric-label">Sprint progress</span><strong>0%</strong><div class="progress" aria-label="0 percent complete"><span style="width:0%"></span></div></article>
+  <article class="card metric-card"><span class="metric-label">Completed points</span><strong>0</strong><span class="muted">No active sprint</span></article>
+  <article class="card metric-card"><span class="metric-label">Blockers</span><strong>0</strong><span class="status-chip status-backlog">None reported</span></article>
+  <article class="card metric-card"><span class="metric-label">Stand-ups</span><strong>0/0</strong><span class="muted">Waiting for your team</span></article>
+</section>
+<section class="content-grid">
+  <article class="card empty-state"><div class="aria-orb">A</div><h2>Aria is ready</h2><p>Create a project and sprint to receive a focused daily brief, risks, and recommended actions.</p><button class="button button-primary">Set up your project</button></article>
+  <aside class="card"><div class="section-heading"><div><p class="eyebrow">Attention</p><h2>Next actions</h2></div><span class="badge">0</span></div><div class="skeleton-list" aria-hidden="true"><span></span><span></span><span></span></div></aside>
+</section>
+{% endblock %}

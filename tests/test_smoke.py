@@ -27,6 +27,14 @@ def test_signup_page() -> None:
     assert "Create your workspace" in response.text
 
 
+def test_today_shell() -> None:
+    response = client.get("/today")
+    assert response.status_code == 200
+    for label in ("Today", "Sprint", "Backlog", "Team", "Aria", "Insights", "Settings"):
+        assert label in response.text
+    assert 'aria-controls="primary-nav"' in response.text
+
+
 def test_unknown_page_uses_friendly_404() -> None:
     response = client.get("/not-a-real-page")
     assert response.status_code == 404
