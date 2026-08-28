@@ -1,0 +1,1 @@
+"""SMPilot AI application package."""

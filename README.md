@@ -46,6 +46,50 @@ Aria helps teams:
 
 `Create account → Create team/project → Build backlog → AI sprint planning → Start sprint → Daily updates → Aria monitoring & interventions → Sprint review → AI retrospective → Next sprint`
 
+## Local development
+
+Requirements: Python 3.12+ and PostgreSQL.
+
+```bash
+python -m venv .venv
+# Windows: .venv\Scripts\activate
+# macOS/Linux: source .venv/bin/activate
+python -m pip install -r requirements.txt
+cp .env.example .env
+```
+
+Create a PostgreSQL database and update `DATABASE_URL` in `.env`. Replace
+`SESSION_SECRET` with a long random value. Never commit `.env`.
+
+Initialize or update the database and start the application:
+
+```bash
+alembic upgrade head
+python run.py
+```
+
+Open `http://localhost:8000`. The health check is available at `/health`.
+
+Run the test suite with:
+
+```bash
+pytest
+```
+
+## Configuration
+
+Runtime settings are loaded from environment variables. See `.env.example` for
+application, PostgreSQL, session, OpenAI, and SMTP settings. OpenAI and SMTP are
+optional for the initial foundation.
+
+## Project structure
+
+- `app/`: FastAPI application, routes, templates, static assets, and services
+- `migrations/`: Alembic migration environment and revisions
+- `scripts/`: maintenance and operational scripts
+- `tests/`: automated tests
+
 ## Status
 
-Initial product foundation and Codex implementation backlog are being prepared.
+The production-oriented FastAPI foundation is in place. Authentication and the
+remaining Scrum workflow are implemented in subsequent roadmap tasks.

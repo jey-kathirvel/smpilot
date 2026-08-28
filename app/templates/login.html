@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="auth-card">
+  <p class="eyebrow">SMPilot AI</p>
+  <h1>Welcome back</h1>
+  <p>Log in to continue with Aria, your autonomous AI Scrum Master.</p>
+  <form>
+    <label>Email<input type="email" name="email" autocomplete="email" required></label>
+    <label>Password<input type="password" name="password" autocomplete="current-password" required></label>
+    <button type="submit">Log in</button>
+  </form>
+  <p class="form-note">New to SMPilot? <a href="/signup">Create an account</a></p>
+</section>
+{% endblock %}

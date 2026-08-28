@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="auth-card"><p class="eyebrow">SMPilot AI</p><h1>Create your workspace</h1><p>Start running clearer, healthier sprints with Aria.</p>
+<form><label>Full name<input type="text" name="full_name" autocomplete="name" required></label><label>Email<input type="email" name="email" autocomplete="email" required></label><label>Password<input type="password" name="password" autocomplete="new-password" required></label><button type="submit">Create account</button></form>
+<p class="form-note">Already registered? <a href="/login">Log in</a></p></section>
+{% endblock %}
