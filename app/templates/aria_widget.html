@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Ask Aria</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='/css/app.css') }}?v=aria-header-1">
+</head>
+<body class="aria-widget-body">
+  <main class="aria-widget-content">
+    <div class="aria-widget-intro"><span class="aria-orb">A</span><div><strong>Aria</strong><small>AI Scrum Master</small></div></div>
+    <section class="aria-widget-messages" aria-live="polite">
+      {% for message in messages[-12:] %}<article class="chat-message chat-{{ message.role }}"><strong>{{ 'You' if message.role == 'user' else 'Aria' }}</strong><p>{{ message.content }}</p>{% if message.facts and message.role == 'assistant' and message.facts.recommended_action %}<p><b>Next:</b> {{ message.facts.recommended_action }}</p>{% endif %}</article>{% else %}<p class="muted">Ask about sprint health, blockers, delivery risk, or what needs focus today.</p>{% endfor %}
+    </section>
+    <form method="post" action="/aria" class="aria-widget-form">
+      <input type="hidden" name="csrf" value="{{ csrf_token }}">
+      <input type="hidden" name="embed" value="1">
+      <label for="aria-question" class="sr-only">Ask Aria a question</label>
+      <textarea id="aria-question" name="question" required maxlength="2000" rows="2" placeholder="Ask Aria anything about your sprint…"></textarea>
+      <button type="submit">Send</button>
+    </form>
+  </main>
+</body>
+</html>

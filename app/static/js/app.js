@@ -7,6 +7,29 @@ if (navToggle && primaryNav) {
     navToggle.setAttribute('aria-expanded', String(!isOpen));
     primaryNav.classList.toggle('is-open', !isOpen);
   });
+  primaryNav.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => {
+    navToggle.setAttribute('aria-expanded', 'false');
+    primaryNav.classList.remove('is-open');
+  }));
+}
+
+const ariaLauncher = document.querySelector('.aria-chat-launcher');
+const ariaDrawer = document.querySelector('.aria-chat-drawer');
+const ariaClose = document.querySelector('.aria-chat-close');
+if (ariaLauncher && ariaDrawer) {
+  const setAriaOpen = (open) => {
+    ariaDrawer.hidden = !open;
+    ariaLauncher.setAttribute('aria-expanded', String(open));
+    if (open) {
+      const frame = ariaDrawer.querySelector('iframe');
+      if (frame && !frame.src) frame.src = frame.dataset.src;
+    }
+  };
+  ariaLauncher.addEventListener('click', () => setAriaOpen(ariaDrawer.hidden));
+  if (ariaClose) ariaClose.addEventListener('click', () => setAriaOpen(false));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !ariaDrawer.hidden) setAriaOpen(false);
+  });
 }
 
 const notificationCount = document.querySelector('.notification-count');

@@ -190,3 +190,39 @@ html,body{font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smo
   .app-shell{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
   .pwa-install{display:none}
 }
+
+/* Readable sticky header, global Aria chat and polished mobile menu */
+.site-header{position:sticky;top:0;z-index:100;background:rgba(238,250,252,.94);box-shadow:0 5px 22px rgba(2,47,64,.18)}
+.primary-nav a{color:#0d3546;font-size:.84rem;font-weight:750;text-shadow:none}
+.primary-nav a:hover{color:#052b3b;background:rgba(255,255,255,.72)}
+.primary-nav a.active{color:#004d6a;background:#d4eef4;box-shadow:inset 0 0 0 1px rgba(22,116,146,.14)}
+.aria-identity{display:none}
+.header-actions .avatar{color:white}
+.aria-chat-launcher{position:fixed;right:1.25rem;bottom:1.25rem;z-index:110;display:flex;align-items:center;gap:.55rem;min-height:3rem;padding:.45rem .9rem .45rem .45rem;border:1px solid rgba(255,255,255,.78);border-radius:999px;background:linear-gradient(135deg,#087fa9,#075b87);color:white;box-shadow:0 12px 30px rgba(1,48,70,.3)}
+.aria-chat-launcher:hover{background:linear-gradient(135deg,#08759d,#054e76)}
+.aria-launcher-mark{display:grid;place-items:center;width:2.05rem;height:2.05rem;border-radius:50%;background:rgba(255,255,255,.2);font-weight:900}
+.aria-chat-drawer{position:fixed;right:1.25rem;bottom:5rem;z-index:109;width:min(25rem,calc(100vw - 2rem));height:min(38rem,calc(100dvh - 7rem));overflow:hidden;border:1px solid rgba(255,255,255,.82);border-radius:1.15rem;background:rgba(238,247,248,.97);box-shadow:0 24px 60px rgba(1,39,56,.36);backdrop-filter:blur(18px)}
+.aria-chat-drawer[hidden]{display:none}
+.aria-chat-drawer>header{height:3.6rem;display:flex;align-items:center;justify-content:space-between;padding:.7rem .8rem .7rem 1rem;background:linear-gradient(135deg,#087fa9,#075b87);color:white}
+.aria-chat-drawer>header>div{display:grid;line-height:1.1}.aria-chat-drawer>header small{color:#d9f5ff;font-size:.7rem}.aria-chat-close{width:2.25rem;min-height:2.25rem;padding:0;border-radius:50%;background:rgba(255,255,255,.16);font-size:1.4rem;box-shadow:none}
+.aria-chat-drawer iframe{display:block;width:100%;height:calc(100% - 3.6rem);border:0;background:#eff8fa}
+.aria-widget-body{min-height:100dvh;background:#eff8fa;color:#143746}
+.aria-widget-body::before,.aria-widget-body::after{display:none}
+.aria-widget-content{min-height:100dvh;display:grid;grid-template-rows:auto 1fr auto;gap:.7rem;padding:.8rem}
+.aria-widget-intro{display:flex;align-items:center;gap:.65rem}.aria-widget-intro .aria-orb{width:2.5rem;height:2.5rem;border-radius:.75rem}.aria-widget-intro>div{display:grid}.aria-widget-intro small{color:#52707c}
+.aria-widget-messages{min-height:0;overflow-y:auto;display:grid;align-content:start;gap:.55rem;padding:.15rem}
+.chat-message{max-width:90%;padding:.65rem .75rem;border-radius:.8rem;background:white;box-shadow:0 3px 10px rgba(4,55,73,.07)}.chat-message strong{font-size:.76rem}.chat-message p{margin:.2rem 0;color:#294b59;line-height:1.45}.chat-user{justify-self:end;background:#d7f0f6}.chat-assistant{justify-self:start}
+.aria-widget-form{grid-template-columns:1fr auto;align-items:end;gap:.5rem;margin:0;padding-top:.6rem;border-top:1px solid #ccdee4}.aria-widget-form textarea{min-height:3rem;max-height:7rem}.aria-widget-form button{min-height:3rem}
+
+@media(max-width:768px){
+  .site-header{position:sticky;top:0;z-index:100;flex-wrap:nowrap}
+  .primary-nav{top:calc(100% + .35rem);right:.55rem;left:.55rem;width:auto;max-height:calc(100dvh - 4.5rem);margin:0;padding:.55rem;border:1px solid rgba(255,255,255,.82);border-radius:.85rem;background:rgba(240,250,251,.98);box-shadow:0 18px 42px rgba(2,44,61,.28);backdrop-filter:blur(20px)}
+  .primary-nav a{min-height:3rem;padding:.75rem .9rem;color:#0b3445;font-size:.98rem;font-weight:760}
+  .primary-nav a+a{border-top:1px solid rgba(25,98,122,.09)}
+  .primary-nav a.active{padding-left:1.15rem;background:#d6eff4}
+  .primary-nav a.active::before{content:"";position:absolute;top:.7rem;bottom:.7rem;left:.45rem;width:3px;border-radius:3px;background:#087fa9}
+  .nav-toggle[aria-expanded="true"]{background:#d5edf3}
+  .aria-chat-launcher{right:.75rem;bottom:max(.75rem,env(safe-area-inset-bottom));padding-right:.7rem}.aria-chat-launcher>span:last-child{display:none}
+  .aria-chat-drawer{inset:auto 0 0;width:100%;height:min(82dvh,42rem);border-radius:1.2rem 1.2rem 0 0}
+  .aria-widget-content{padding:.65rem}
+}
