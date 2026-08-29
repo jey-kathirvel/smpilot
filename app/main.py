@@ -110,6 +110,11 @@ async def health() -> dict[str, str]:
 async def http_error(request: Request, exc: HTTPException):
     if exc.status_code == 401:
         return RedirectResponse("/login", status_code=303)
+    if exc.status_code == 403 and request.method == "GET" and request.session.get("user_id"):
+        if not request.session.get("workspace_id"):
+            return RedirectResponse("/settings/workspace", status_code=303)
+        if not request.session.get("project_id"):
+            return RedirectResponse("/settings/projects", status_code=303)
     if exc.status_code in {403, 404}:
         return templates.TemplateResponse(
             request,

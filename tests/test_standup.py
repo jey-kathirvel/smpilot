@@ -21,4 +21,6 @@ def test_standup_requires_an_authorized_project() -> None:
     from app.main import app
     client = TestClient(app)
     client.post("/signup", data={"csrf": csrf(client, "/signup"), "full_name": "No Project", "email": "standup-no-project@example.com", "password": "SecurePass123", "confirm_password": "SecurePass123", "mobile": "", "organization_name": ""})
-    assert client.get("/standup").status_code == 403
+    response = client.get("/standup", follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers["location"] == "/settings/workspace"

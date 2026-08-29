@@ -41,4 +41,6 @@ def test_backlog_crud_readiness_and_archive() -> None:
 def test_backlog_requires_authorized_project() -> None:
     client = TestClient(app)
     client.post("/signup", data={"csrf": csrf(client, "/signup"), "full_name": "No Project", "email": "no-project@example.com", "password": "SecurePass123", "confirm_password": "SecurePass123", "mobile": "", "organization_name": ""})
-    assert client.get("/backlog").status_code == 403
+    response = client.get("/backlog", follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers["location"] == "/settings/workspace"
