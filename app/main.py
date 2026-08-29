@@ -49,6 +49,15 @@ def service_worker():
         headers={"Service-Worker-Allowed": "/", "Cache-Control": "no-cache"},
     )
 
+
+@app.get("/manifest.json", include_in_schema=False)
+def web_manifest():
+    return FileResponse(
+        "app/static/manifest.json",
+        media_type="application/manifest+json",
+        headers={"Cache-Control": "public, max-age=3600"},
+    )
+
 app.include_router(auth_router)
 app.include_router(organization_router)
 app.include_router(backlog_router)

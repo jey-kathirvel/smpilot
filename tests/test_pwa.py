@@ -5,11 +5,12 @@ from app.main import app
 
 def test_pwa_files():
     client = TestClient(app)
-    manifest = client.get("/static/manifest.json")
+    manifest = client.get("/manifest.json")
     assert manifest.status_code == 200
     data = manifest.json()
     assert data["display"] == "standalone"
     assert data["start_url"] == "/today"
+    assert manifest.headers["content-type"].startswith("application/manifest+json")
     assert {icon["sizes"] for icon in data["icons"]} == {"192x192", "512x512"}
     worker = client.get("/service-worker.js")
     assert worker.status_code == 200
