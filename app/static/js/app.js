@@ -80,6 +80,19 @@ if ('serviceWorker' in navigator && window.isSecureContext) {
 
 let deferredInstallPrompt;
 const installButton = document.querySelector('.pwa-install');
+const installHelp = document.querySelector('.pwa-install-help');
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+const isMobileViewport = window.matchMedia('(max-width: 768px)').matches;
+const showInstallHelp = () => {
+  if (!installHelp) return;
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const iosCopy = installHelp.querySelector('.pwa-ios-copy');
+  const browserCopy = installHelp.querySelector('.pwa-browser-copy');
+  if (iosCopy) iosCopy.hidden = !isIOS;
+  if (browserCopy) browserCopy.hidden = isIOS;
+  installHelp.hidden = false;
+};
+if (installButton && isMobileViewport && !isStandalone) installButton.hidden = false;
 window.addEventListener('beforeinstallprompt', (event) => {
   event.preventDefault();
   deferredInstallPrompt = event;
@@ -87,12 +100,19 @@ window.addEventListener('beforeinstallprompt', (event) => {
 });
 if (installButton) {
   installButton.addEventListener('click', async () => {
-    if (!deferredInstallPrompt) return;
+    if (!deferredInstallPrompt) {
+      showInstallHelp();
+      return;
+    }
     deferredInstallPrompt.prompt();
     await deferredInstallPrompt.userChoice;
     deferredInstallPrompt = null;
     installButton.hidden = true;
   });
+}
+if (installHelp) {
+  installHelp.querySelectorAll('.pwa-help-close,.pwa-help-done').forEach((button) => button.addEventListener('click', () => { installHelp.hidden = true; }));
+  installHelp.addEventListener('click', (event) => { if (event.target === installHelp) installHelp.hidden = true; });
 }
 window.addEventListener('appinstalled', () => {
   deferredInstallPrompt = null;
