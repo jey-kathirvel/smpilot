@@ -3,6 +3,7 @@ import re
 from fastapi.testclient import TestClient
 
 from app.main import app
+from tests import test_auth as _test_auth  # noqa: F401 - installs the test DB override
 
 
 def csrf(client, path):
@@ -44,3 +45,21 @@ def test_backlog_requires_authorized_project() -> None:
     response = client.get("/backlog", follow_redirects=False)
     assert response.status_code == 303
     assert response.headers["location"] == "/settings/workspace"
+
+
+def test_dependency_requires_another_item_and_never_returns_validation_json() -> None:
+    client = setup_project("dependency-owner@example.com")
+    first = client.post("/backlog", data={"csrf": csrf(client, "/backlog"), "type": "Story", "title": "First item", "priority": "High", "story_points": "3", "status": "Backlog"}, follow_redirects=False)
+    first_url = first.headers["location"]
+    page = client.get(first_url)
+    assert "No target items available" in page.text
+    assert "Create another backlog item" in page.text
+    malformed = client.post(f"{first_url}/dependencies", data={"csrf": csrf(client, first_url), "relation_type": "Blocks"}, follow_redirects=False)
+    assert malformed.status_code == 303
+    assert "dependency_error=1" in malformed.headers["location"]
+    assert "Select a valid target backlog item" in client.get(malformed.headers["location"]).text
+    second = client.post("/backlog", data={"csrf": csrf(client, "/backlog"), "type": "Story", "title": "Second item", "priority": "Medium", "story_points": "2", "status": "Backlog"}, follow_redirects=False)
+    second_id = second.headers["location"].rsplit("/", 1)[-1]
+    added = client.post(f"{first_url}/dependencies", data={"csrf": csrf(client, first_url), "relation_type": "Blocks", "target_item_id": second_id}, follow_redirects=False)
+    assert added.status_code == 303
+    assert "Second item" in client.get(first_url).text

@@ -66,12 +66,13 @@ def create_item(request: Request, title: str = Form(), item_type: str = Form(ali
 
 
 @router.get("/backlog/{item_id}", include_in_schema=False)
-def item_detail(request: Request, item_id: str, user: User = Depends(require_user), db: Session = Depends(get_db)):
+def item_detail(request: Request, item_id: str, dependency_error: str = "", user: User = Depends(require_user), db: Session = Depends(get_db)):
     project = project_or_403(request, db, user); item = owned_item(db, project.id, item_id)
     team = db.scalars(select(TeamMember).where(TeamMember.project_id == project.id)).all()
     targets = db.scalars(select(WorkItem).where(WorkItem.project_id == project.id, WorkItem.id != item.id, WorkItem.archived.is_(False))).all()
     dependencies = db.execute(select(WorkItemDependency, WorkItem).join(WorkItem, WorkItem.id == WorkItemDependency.target_item_id).where(WorkItemDependency.source_item_id == item.id)).all()
-    return templates.TemplateResponse(request, "work_item.html", {"page_title": item.item_key, "show_nav": True, "user": user, "csrf_token": csrf_token(request), "project": project, "item": item, "team": team, "targets": targets, "dependencies": dependencies, "warnings": readiness_warnings(db, item), "types": WORK_ITEM_TYPES, "statuses": BACKLOG_STATUSES, "priorities": PRIORITIES, "relations": DEPENDENCY_TYPES})
+    error_message = "Select a valid target backlog item." if dependency_error else ""
+    return templates.TemplateResponse(request, "work_item.html", {"page_title": item.item_key, "show_nav": True, "user": user, "csrf_token": csrf_token(request), "project": project, "item": item, "team": team, "targets": targets, "dependencies": dependencies, "dependency_error": error_message, "warnings": readiness_warnings(db, item), "types": WORK_ITEM_TYPES, "statuses": BACKLOG_STATUSES, "priorities": PRIORITIES, "relations": DEPENDENCY_TYPES})
 
 
 @router.post("/backlog/{item_id}", include_in_schema=False)
@@ -84,10 +85,19 @@ def update_item(request: Request, item_id: str, title: str = Form(), item_type: 
 
 
 @router.post("/backlog/{item_id}/dependencies", include_in_schema=False)
-def add_dependency(request: Request, item_id: str, target_item_id: str = Form(), relation_type: str = Form(), csrf: str = Form(), user: User = Depends(require_user), db: Session = Depends(get_db)):
-    validate_csrf(request, csrf); project = project_or_403(request, db, user); item = owned_item(db, project.id, item_id); target = owned_item(db, project.id, target_item_id)
-    if relation_type not in DEPENDENCY_TYPES or item.id == target.id: raise HTTPException(400)
-    db.add(WorkItemDependency(source_item_id=item.id, target_item_id=target.id, relation_type=relation_type)); db.commit()
+def add_dependency(request: Request, item_id: str, csrf: str = Form(), target_item_id: str = Form(default=""), relation_type: str = Form(default=""), user: User = Depends(require_user), db: Session = Depends(get_db)):
+    validate_csrf(request, csrf); project = project_or_403(request, db, user); item = owned_item(db, project.id, item_id)
+    if not target_item_id or relation_type not in DEPENDENCY_TYPES:
+        return RedirectResponse(f"/backlog/{item.id}?dependency_error=1", status_code=303)
+    try:
+        target = owned_item(db, project.id, target_item_id)
+    except HTTPException:
+        return RedirectResponse(f"/backlog/{item.id}?dependency_error=1", status_code=303)
+    if item.id == target.id:
+        return RedirectResponse(f"/backlog/{item.id}?dependency_error=1", status_code=303)
+    existing = db.scalar(select(WorkItemDependency.id).where(WorkItemDependency.source_item_id == item.id, WorkItemDependency.target_item_id == target.id, WorkItemDependency.relation_type == relation_type))
+    if not existing:
+        db.add(WorkItemDependency(source_item_id=item.id, target_item_id=target.id, relation_type=relation_type)); db.commit()
     return RedirectResponse(f"/backlog/{item.id}", status_code=303)
 
 
