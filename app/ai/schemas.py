@@ -34,6 +34,12 @@ class SprintPlanRecommendation(BaseModel):
     requires_human_approval: bool = True
 
 
+class MemberNextAction(BaseModel):
+    member_name: str
+    action: str
+    rationale: str = ""
+
+
 class DailyScrumSummary(BaseModel):
     team_summary: str
     accomplishments: list[str] = []
@@ -44,6 +50,7 @@ class DailyScrumSummary(BaseModel):
     stale_stories: list[str] = []
     coordination_needed: list[str] = []
     follow_up_suggestions: list[str] = []
+    member_next_actions: list[MemberNextAction] = []
     confidence: float = Field(ge=0, le=1)
 
 class AriaAnswer(BaseModel):
