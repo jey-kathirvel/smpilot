@@ -137,6 +137,21 @@ button:hover,.button:hover{background:#066f9a}
   .content-grid{grid-template-columns:1fr}
 }
 
+/* UAT defect corrections: solid canvas, fixed mobile header, visible Aria frame */
+html{background:#3984A2}
+body{background:#3984A2;color:#092c3b}
+body::before,body::after{display:none}
+.aria-chat-drawer iframe{color-scheme:light;background:#eff8fa}
+
+@media(max-width:768px){
+  body{background:#3984A2}
+  .site-header{position:fixed;top:0;right:0;left:0;width:100%;z-index:200;padding-top:max(.48rem,env(safe-area-inset-top))}
+  .app-shell{padding-top:calc(4.65rem + env(safe-area-inset-top));scroll-margin-top:4.65rem}
+  .primary-nav{position:fixed;top:calc(3.65rem + env(safe-area-inset-top));right:.55rem;left:.55rem;z-index:201}
+  .aria-chat-drawer{z-index:220}
+  .aria-chat-launcher{z-index:221}
+}
+
 /* Mobile, PWA and readability refinements */
 html,body{font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 .card,.auth-card,.modal,.table-wrap,.board-column{color:#102d3a}

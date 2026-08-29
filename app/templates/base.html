@@ -12,7 +12,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/static/icons/icon-192.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/static/icons/icon-192.svg">
-  <link rel="stylesheet" href="{{ url_for('static', path='/css/app.css') }}?v=aria-header-1">
+  <link rel="stylesheet" href="{{ url_for('static', path='/css/app.css') }}?v=defects-mobile-2">
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -30,6 +30,6 @@
     {% block content %}{% endblock %}
   </main>
   {% if show_nav and user %}<button class="aria-chat-launcher" type="button" aria-expanded="false" aria-controls="aria-chat-panel"><span class="aria-launcher-mark" aria-hidden="true">A</span><span>Ask Aria</span></button><aside id="aria-chat-panel" class="aria-chat-drawer" aria-label="Ask Aria" hidden><header><div><strong>Ask Aria</strong><small>Your AI Scrum Master</small></div><button class="aria-chat-close" type="button" aria-label="Close Aria chat">×</button></header><iframe title="Ask Aria chatbot" data-src="/aria?embed=1"></iframe></aside>{% endif %}
-  <script src="{{ url_for('static', path='/js/app.js') }}?v=aria-header-1" defer></script>
+  <script src="{{ url_for('static', path='/js/app.js') }}?v=defects-mobile-2" defer></script>
 </body>
 </html>
