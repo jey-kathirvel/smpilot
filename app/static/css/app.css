@@ -137,6 +137,23 @@ button:hover,.button:hover{background:#066f9a}
   .content-grid{grid-template-columns:1fr}
 }
 
+/* Compact colourful navigation icons */
+.primary-nav a{display:inline-flex;align-items:center;gap:.38rem}
+.nav-icon{display:inline-grid;place-items:center;width:1.35rem;height:1.35rem;flex:0 0 1.35rem;border:1px solid rgba(255,255,255,.72);border-radius:.42rem;color:white;font-family:"Segoe UI Symbol","Segoe UI",sans-serif;font-size:.68rem;font-weight:900;line-height:1;box-shadow:0 3px 8px rgba(4,54,73,.12)}
+.icon-today{background:linear-gradient(145deg,#f6a623,#ef7d2a)}
+.icon-standup{background:linear-gradient(145deg,#19ae83,#0a8c77)}
+.icon-sprint{background:linear-gradient(145deg,#765ee5,#5943bf)}
+.icon-backlog{background:linear-gradient(145deg,#2e9ed0,#1676aa)}
+.icon-team{background:linear-gradient(145deg,#e65c91,#bc3e73)}
+.icon-insights{background:linear-gradient(145deg,#16b6c7,#078caa)}
+.icon-settings{background:linear-gradient(145deg,#718495,#506577)}
+.primary-nav a:hover .nav-icon,.primary-nav a.active .nav-icon{transform:translateY(-1px);box-shadow:0 4px 10px rgba(4,54,73,.2)}
+
+@media(max-width:768px){
+  .primary-nav a{gap:.7rem}
+  .nav-icon{width:1.7rem;height:1.7rem;flex-basis:1.7rem;border-radius:.5rem;font-size:.82rem}
+}
+
 /* UAT defect corrections: solid canvas, fixed mobile header, visible Aria frame */
 html{background:#3984A2}
 body{background:#3984A2;color:#092c3b}
