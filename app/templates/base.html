@@ -3,14 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#082f49">
+  <meta name="theme-color" content="#0b7798">
+  <meta name="description" content="SMPilot AI — your AI Scrum Master for focused, healthier sprints.">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>{{ page_title }} · SMPilot AI</title>
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/static/icons/icon-192.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/static/icons/icon-192.svg">
-  <link rel="stylesheet" href="{{ url_for('static', path='/css/app.css') }}?v=9026aff-ocean">
+  <link rel="stylesheet" href="{{ url_for('static', path='/css/app.css') }}?v=mobile-pwa-1">
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -21,12 +23,12 @@
     <nav id="primary-nav" class="primary-nav" aria-label="Primary navigation">
       {% set path = request.url.path %}<a class="{{ 'active' if path == '/today' else '' }}" href="/today">Today</a><a class="{{ 'active' if path.startswith('/standup') else '' }}" href="/standup">Stand-up</a><a class="{{ 'active' if path.startswith('/sprint') else '' }}" href="/sprint">Sprint</a><a class="{{ 'active' if path.startswith('/backlog') else '' }}" href="/backlog">Backlog</a><a class="{{ 'active' if path == '/team' else '' }}" href="/team">Team</a><a class="aria-link {{ 'active' if path.startswith('/aria') else '' }}" href="/aria">Ask Aria</a><a class="{{ 'active' if path == '/insights' else '' }}" href="/insights">Insights</a><a class="{{ 'active' if path.startswith('/settings') or path == '/profile' else '' }}" href="/settings/workspace">Settings</a>
     </nav>
-    <div class="header-actions">{% include "_aria_identity.html" %}<a class="icon-button notification-link" href="/notifications" aria-label="Notifications"><span aria-hidden="true">N</span><span class="notification-count" hidden>0</span></a>{% if user %}<a class="avatar" href="/profile" aria-label="User profile">{{ user.full_name[:2]|upper }}</a>{% else %}<span class="avatar" aria-label="User profile">SP</span>{% endif %}</div>
+    <div class="header-actions"><button class="pwa-install" type="button" hidden>Install app</button>{% include "_aria_identity.html" %}<a class="icon-button notification-link" href="/notifications" aria-label="Notifications"><span aria-hidden="true">N</span><span class="notification-count" hidden>0</span></a>{% if user %}<a class="avatar" href="/profile" aria-label="User profile">{{ user.full_name[:2]|upper }}</a>{% else %}<span class="avatar" aria-label="User profile">SP</span>{% endif %}</div>
   </header>
   {% endif %}
   <main id="main-content" class="{% if show_nav %}app-shell{% else %}page-shell{% endif %}">
     {% block content %}{% endblock %}
   </main>
-  <script src="{{ url_for('static', path='/js/app.js') }}?v=9026aff-ocean" defer></script>
+  <script src="{{ url_for('static', path='/js/app.js') }}?v=mobile-pwa-1" defer></script>
 </body>
 </html>

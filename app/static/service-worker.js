@@ -1,5 +1,5 @@
-const CACHE = 'smpilot-shell-v2';
-const SHELL = ['/static/offline.html', '/static/icons/icon-192.svg', '/static/icons/icon-512.svg'];
+const CACHE = 'smpilot-shell-v3';
+const SHELL = ['/static/offline.html', '/static/images/ocean-workspace-bg.png', '/static/icons/icon-192.svg', '/static/icons/icon-512.svg'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));
