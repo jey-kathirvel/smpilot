@@ -23,5 +23,8 @@ if (notificationCount) {
 }
 
 if ('serviceWorker' in navigator && window.isSecureContext) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('/service-worker.js', { scope: '/' }).catch(() => {}));
+  window.addEventListener('load', () => navigator.serviceWorker.register('/service-worker.js', {
+    scope: '/',
+    updateViaCache: 'none',
+  }).then((registration) => registration.update()).catch(() => {}));
 }

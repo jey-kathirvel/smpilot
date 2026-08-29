@@ -1,5 +1,5 @@
-const CACHE = 'smpilot-shell-v1';
-const SHELL = ['/static/offline.html', '/static/css/app.css', '/static/js/app.js', '/static/icons/icon-192.svg', '/static/icons/icon-512.svg'];
+const CACHE = 'smpilot-shell-v2';
+const SHELL = ['/static/offline.html', '/static/icons/icon-192.svg', '/static/icons/icon-512.svg'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));
@@ -20,9 +20,9 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   if (requestUrl.pathname.startsWith('/static/')) {
-    event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request).then((response) => {
+    event.respondWith(fetch(event.request).then((response) => {
       if (response.ok) caches.open(CACHE).then((cache) => cache.put(event.request, response.clone()));
       return response;
-    })));
+    }).catch(() => caches.match(event.request)));
   }
 });
