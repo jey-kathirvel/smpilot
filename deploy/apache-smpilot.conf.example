@@ -1,0 +1,22 @@
+<VirtualHost *:80>
+    ServerName smpilot.ads-ai.in
+    RewriteEngine On
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+</VirtualHost>
+
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+    ServerName smpilot.ads-ai.in
+
+    ProxyPreserveHost On
+    ProxyPass / http://127.0.0.1:8130/ retry=0 timeout=60
+    ProxyPassReverse / http://127.0.0.1:8130/
+    RequestHeader set X-Forwarded-Proto "https"
+
+    ErrorLog ${APACHE_LOG_DIR}/smpilot-error.log
+    CustomLog ${APACHE_LOG_DIR}/smpilot-access.log combined
+
+    SSLEngine on
+    # Certbot manages the certificate directives in the installed vhost.
+</VirtualHost>
+</IfModule>

@@ -93,6 +93,9 @@ reset requests return the same response whether or not an account exists.
 - `migrations/`: Alembic migration environment and revisions
 - `scripts/`: maintenance and operational scripts
 - `tests/`: automated tests
+- `deploy/`: reviewed systemd, Apache, and Hostinger deployment examples
+
+Production deployment guidance is in `deploy/deployment.md`. The application defaults to OpenRouter's free model route when configured; direct OpenAI configuration remains supported but optional.
 
 ## Status
 
