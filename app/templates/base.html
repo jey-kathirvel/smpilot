@@ -10,7 +10,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/static/icons/icon-192.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/static/icons/icon-192.svg">
-  <link rel="stylesheet" href="{{ url_for('static', path='/css/app.css') }}?v=07519ae-ui2">
+  <link rel="stylesheet" href="{{ url_for('static', path='/css/app.css') }}?v=9026aff-ocean">
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -27,6 +27,6 @@
   <main id="main-content" class="{% if show_nav %}app-shell{% else %}page-shell{% endif %}">
     {% block content %}{% endblock %}
   </main>
-  <script src="{{ url_for('static', path='/js/app.js') }}?v=07519ae-ui2" defer></script>
+  <script src="{{ url_for('static', path='/js/app.js') }}?v=9026aff-ocean" defer></script>
 </body>
 </html>

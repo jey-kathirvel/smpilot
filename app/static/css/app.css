@@ -88,3 +88,51 @@ fieldset{padding:.8rem;border:1px solid var(--border-strong);border-radius:.75re
 @media(max-width:600px){.chart-row{grid-template-columns:1fr}.chart-row small{justify-self:end}}
 @media (max-width: 430px) {.app-shell{padding:1rem}.hero-panel{align-items:flex-start;flex-direction:column;gap:1rem;border-radius:1.15rem}.metric-grid{grid-template-columns:1fr}.card{padding:1rem;border-radius:1rem}.header-actions .icon-button{display:none}.filter-grid{grid-template-columns:1fr}.filter-grid label:first-child{grid-column:auto}.list-item{align-items:flex-start;flex-direction:column}.form-actions,.form-actions form,.form-actions button{width:100%}.auth-card{padding:1.35rem;border-radius:1.25rem}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+
+/* Immersive ocean workspace theme */
+body{background:#087e9f url("/static/images/ocean-workspace-bg.png") center/cover fixed no-repeat;color:#092c3b}
+body::before{inset:0;width:auto;height:auto;border-radius:0;background:linear-gradient(180deg,rgba(0,84,116,.08),rgba(0,93,125,.14));filter:none}
+body::after{display:none}
+.site-header{min-height:3.8rem;justify-content:center;padding:.45rem clamp(1rem,3vw,2.2rem);border-bottom:1px solid rgba(255,255,255,.48);background:rgba(225,245,248,.7);box-shadow:0 4px 22px rgba(2,55,75,.13);backdrop-filter:blur(18px) saturate(125%)}
+.brand{position:absolute;left:clamp(1rem,3vw,2.2rem)}
+.brand span:last-child{display:none}
+.brand-mark{width:2.45rem;height:2.45rem;border-radius:.75rem;background:linear-gradient(145deg,rgba(2,134,174,.82),rgba(25,191,207,.76));box-shadow:0 5px 15px rgba(3,73,96,.18),inset 0 1px rgba(255,255,255,.55)}
+.primary-nav{flex:0 1 auto;gap:.08rem}
+.primary-nav a{padding:.55rem .68rem;color:#173e4e;font-size:.78rem;font-weight:650}
+.primary-nav a:hover{background:rgba(255,255,255,.38)}
+.primary-nav a.active{color:#07516d;background:rgba(255,255,255,.62);box-shadow:0 3px 10px rgba(4,70,92,.1)}
+.primary-nav a.active::after{display:none}
+.header-actions{position:absolute;right:clamp(1rem,3vw,2.2rem)}
+.aria-identity>span:last-child,.notification-link{display:none}
+.avatar,.aria-avatar{border-color:rgba(255,255,255,.7);background:rgba(6,132,170,.76);color:white}
+.app-shell{width:min(100%,96rem);min-height:calc(100vh - 3.8rem);padding:clamp(1.45rem,3vw,3.2rem) clamp(1rem,5vw,5.5rem)}
+.page-heading{margin-bottom:1.2rem;padding-bottom:.8rem;border-bottom:1px solid rgba(255,255,255,.64)}
+.page-heading h1,.page-heading p,.page-heading .eyebrow{color:white;text-shadow:0 1px 8px rgba(0,46,67,.26)}
+.page-heading h1{font-size:clamp(1.8rem,3.5vw,2.45rem)}
+.page-heading p{margin:.2rem 0 0;line-height:1.4}
+.page-heading .eyebrow{font-size:.68rem}
+.content-grid{grid-template-columns:minmax(0,2fr) minmax(20rem,1fr);gap:1.15rem}
+.glass-panel,.card{border:1px solid rgba(255,255,255,.72);background:rgba(224,231,232,.67);box-shadow:0 16px 44px rgba(1,42,59,.17),inset 0 1px rgba(255,255,255,.42);backdrop-filter:blur(16px) saturate(112%)}
+.card{padding:clamp(1rem,2vw,1.5rem);border-radius:1.15rem;outline:0}
+.card:hover{border-color:rgba(255,255,255,.84);box-shadow:0 18px 48px rgba(1,42,59,.2)}
+.card h2,.card h3,.card strong,.card label,.card legend{color:#102d3a}
+.card p{color:#3d5b67}
+form{gap:.72rem;margin-top:1rem}
+label{gap:.32rem;color:#163b4a;font-size:.78rem}
+input,select,textarea{min-height:2.65rem;padding:.62rem .75rem;border-color:rgba(140,181,194,.6);border-radius:.55rem;background:rgba(255,255,255,.9);box-shadow:0 1px 3px rgba(4,56,73,.06)}
+input:focus,select:focus,textarea:focus{border-color:#1688b3;box-shadow:0 0 0 3px rgba(10,137,180,.16)}
+fieldset{border-color:rgba(255,255,255,.58);background:rgba(255,255,255,.1)}
+button,.button{min-height:2.6rem;border-radius:.55rem;background:#087dad;box-shadow:0 5px 14px rgba(3,91,127,.14)}
+button:hover,.button:hover{background:#066f9a}
+.secondary-button,.button-secondary{color:#075c7d;background:rgba(255,255,255,.66)}
+.list-item,.backlog-item{border-bottom-color:rgba(255,255,255,.48)}
+.status-chip{border-color:rgba(87,156,119,.3);background:rgba(238,255,239,.82);box-shadow:0 2px 8px rgba(4,70,43,.08)}
+.table-wrap,.board-column{background:rgba(226,235,237,.68);backdrop-filter:blur(14px)}
+.hero-panel{border:1px solid rgba(255,255,255,.72);background:rgba(224,231,232,.67);backdrop-filter:blur(16px)}
+
+@media(max-width:768px){
+  body{background-attachment:scroll}
+  .site-header{justify-content:space-between}.brand,.header-actions{position:static}.brand{display:flex}.nav-toggle{order:2}.header-actions{order:3}
+  .primary-nav{background:rgba(225,245,248,.96)}
+  .content-grid{grid-template-columns:1fr}
+}

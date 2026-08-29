@@ -13,3 +13,12 @@ def test_glassy_ocean_design_tokens_and_navigation_state():
     page = client.get("/backlog")
     assert page.status_code == 200
     assert 'class="active" href="/backlog"' in page.text
+
+
+def test_immersive_ocean_workspace_theme_asset():
+    css = Path("app/static/css/app.css").read_text()
+    background = Path("app/static/images/ocean-workspace-bg.png")
+    assert background.exists()
+    assert background.stat().st_size > 100_000
+    assert 'url("/static/images/ocean-workspace-bg.png")' in css
+    assert "backdrop-filter:blur(16px)" in css
