@@ -225,6 +225,7 @@ html,body{font-synthesis:none;text-rendering:optimizeLegibility;-webkit-font-smo
 .aria-widget-body::before,.aria-widget-body::after{display:none}
 .aria-widget-content{min-height:100dvh;display:grid;grid-template-rows:auto 1fr auto;gap:.7rem;padding:.8rem}
 .aria-widget-intro{display:flex;align-items:center;gap:.65rem}.aria-widget-intro .aria-orb{width:2.5rem;height:2.5rem;border-radius:.75rem}.aria-widget-intro>div{display:grid}.aria-widget-intro small{color:#52707c}
+.aria-clear-form{margin:0 0 0 auto}.aria-clear-form button{min-height:2rem;padding:.3rem .55rem;border:1px solid #b8d7e1;background:rgba(255,255,255,.7);color:#15566f;font-size:.7rem;box-shadow:none}.aria-clear-form button:hover{background:white;color:#0a4055;box-shadow:none}
 .aria-widget-messages{min-height:0;overflow-y:auto;display:grid;align-content:start;gap:.55rem;padding:.15rem}
 .chat-message{max-width:90%;padding:.65rem .75rem;border-radius:.8rem;background:white;box-shadow:0 3px 10px rgba(4,55,73,.07)}.chat-message strong{font-size:.76rem}.chat-message p{margin:.2rem 0;color:#294b59;line-height:1.45}.chat-user{justify-self:end;background:#d7f0f6}.chat-assistant{justify-self:start}
 .aria-widget-form{grid-template-columns:1fr auto;align-items:end;gap:.5rem;margin:0;padding-top:.6rem;border-top:1px solid #ccdee4}.aria-widget-form textarea{min-height:3rem;max-height:7rem}.aria-widget-form button{min-height:3rem}

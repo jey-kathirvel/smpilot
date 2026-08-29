@@ -4,11 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Ask Aria</title>
-  <link rel="stylesheet" href="{{ url_for('static', path='/css/app.css') }}?v=defects-mobile-2">
+  <link rel="stylesheet" href="{{ url_for('static', path='/css/app.css') }}?v=aria-clear-1">
 </head>
 <body class="aria-widget-body">
   <main class="aria-widget-content">
-    <div class="aria-widget-intro"><span class="aria-orb">A</span><div><strong>Aria</strong><small>AI Scrum Master</small></div></div>
+    <div class="aria-widget-intro"><span class="aria-orb">A</span><div><strong>Aria</strong><small>AI Scrum Master</small></div><form method="post" action="/aria/clear" class="aria-clear-form"><input type="hidden" name="csrf" value="{{ csrf_token }}"><input type="hidden" name="embed" value="1"><button type="submit">Clear conversation</button></form></div>
     <section class="aria-widget-messages" aria-live="polite">
       {% for message in messages[-12:] %}<article class="chat-message chat-{{ message.role }}"><strong>{{ 'You' if message.role == 'user' else 'Aria' }}</strong><p>{{ message.content }}</p>{% if message.facts and message.role == 'assistant' and message.facts.recommended_action %}<p><b>Next:</b> {{ message.facts.recommended_action }}</p>{% endif %}</article>{% else %}<p class="muted">Ask about sprint health, blockers, delivery risk, or what needs focus today.</p>{% endfor %}
     </section>

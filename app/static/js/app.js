@@ -17,12 +17,36 @@ const ariaLauncher = document.querySelector('.aria-chat-launcher');
 const ariaDrawer = document.querySelector('.aria-chat-drawer');
 const ariaClose = document.querySelector('.aria-chat-close');
 if (ariaLauncher && ariaDrawer) {
+  const ariaClosedKey = 'smpilot-aria-closed-at';
+  const ariaClearDelay = 10 * 60 * 1000;
+  let ariaClearTimer;
+  const clearAriaConversation = async () => {
+    localStorage.removeItem(ariaClosedKey);
+    try {
+      const body = new URLSearchParams({ csrf: ariaDrawer.dataset.csrf, ajax: '1' });
+      const response = await fetch(ariaDrawer.dataset.clearUrl, { method: 'POST', body });
+      if (response.ok) {
+        const frame = ariaDrawer.querySelector('iframe');
+        if (frame) frame.src = `${frame.dataset.src}&cleared=${Date.now()}`;
+      }
+    } catch (_) {}
+  };
+  const scheduleAriaClear = (closedAt = Date.now()) => {
+    clearTimeout(ariaClearTimer);
+    localStorage.setItem(ariaClosedKey, String(closedAt));
+    const remaining = Math.max(0, ariaClearDelay - (Date.now() - closedAt));
+    ariaClearTimer = setTimeout(clearAriaConversation, remaining);
+  };
   const setAriaOpen = (open) => {
     ariaDrawer.hidden = !open;
     ariaLauncher.setAttribute('aria-expanded', String(open));
     if (open) {
+      clearTimeout(ariaClearTimer);
+      localStorage.removeItem(ariaClosedKey);
       const frame = ariaDrawer.querySelector('iframe');
       if (frame && !frame.src) frame.src = frame.dataset.src;
+    } else {
+      scheduleAriaClear();
     }
   };
   ariaLauncher.addEventListener('click', () => setAriaOpen(ariaDrawer.hidden));
@@ -30,6 +54,8 @@ if (ariaLauncher && ariaDrawer) {
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && !ariaDrawer.hidden) setAriaOpen(false);
   });
+  const previousClose = Number(localStorage.getItem(ariaClosedKey));
+  if (previousClose) scheduleAriaClear(previousClose);
 }
 
 const notificationCount = document.querySelector('.notification-count');

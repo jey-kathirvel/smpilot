@@ -1,7 +1,7 @@
 from fastapi import APIRouter,Depends,Form,HTTPException,Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse,Response
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import select
+from sqlalchemy import delete,select
 from sqlalchemy.orm import Session
 from app.ai.context import build_project_context
 from app.ai.schemas import AriaAnswer
@@ -43,3 +43,10 @@ def ask(request:Request,question:str=Form(),csrf:str=Form(),embed:str=Form(defau
     db.add(AriaMessage(project_id=project.id,user_id=user.id,role="user",content=question)); db.flush(); context=build_project_context(db,project,sprint); context["question"]=question
     result=AriaService(settings).run(db,feature="ask_aria",project_id=project.id,sprint_id=sprint.id if sprint else None,prompt_version="ask-aria-v1",context=context,schema=AriaAnswer,fallback=lambda:fallback(db,sprint,question))
     db.add(AriaMessage(project_id=project.id,user_id=user.id,role="assistant",content=result.answer,facts=result.model_dump(mode="json"))); db.commit(); return RedirectResponse("/aria?embed=1" if embed == "1" else "/aria",303)
+
+@router.post("/aria/clear",include_in_schema=False)
+def clear_chat(request:Request,csrf:str=Form(),embed:str=Form(default="0"),ajax:str=Form(default="0"),user:User=Depends(require_user),db:Session=Depends(get_db)):
+    validate_csrf(request,csrf); project,_=scope(request,db,user)
+    db.execute(delete(AriaMessage).where(AriaMessage.project_id==project.id,AriaMessage.user_id==user.id)); db.commit()
+    if ajax == "1": return Response(status_code=204)
+    return RedirectResponse("/aria?embed=1" if embed == "1" else "/aria",303)
