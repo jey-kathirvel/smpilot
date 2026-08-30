@@ -52,8 +52,11 @@ const fieldHelp = {
 };
 
 let fieldHelpIndex = 0;
+const firstStandupMember = document.querySelector('.team-standup-list .standup-member');
 document.querySelectorAll('label input[name], label textarea[name], label select[name]').forEach((control) => {
   if (!fieldHelp[control.name] || ['hidden', 'checkbox', 'radio'].includes(control.type)) return;
+  const standupMember = control.closest('.standup-member');
+  if (standupMember && standupMember !== firstStandupMember) return;
   const label = control.closest('label');
   if (!label || label.classList.contains('has-field-help')) return;
   const id = `field-help-${++fieldHelpIndex}`;
