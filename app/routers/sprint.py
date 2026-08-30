@@ -53,11 +53,22 @@ def sprint_page(request: Request, user: User = Depends(require_user), db: Sessio
 
 
 @router.post("/sprint", include_in_schema=False)
-def create_sprint(request: Request, name: str = Form(), goal: str = Form(), start_date: date = Form(), end_date: date = Form(), csrf: str = Form(), user: User = Depends(require_user), db: Session = Depends(get_db)):
+def create_sprint(request: Request, name: str = Form(), goal: str = Form(), start_date: date = Form(), end_date: date = Form(), csrf: str = Form(), sprint_id: str = Form(default=""), user: User = Depends(require_user), db: Session = Depends(get_db)):
     validate_csrf(request, csrf); project = project_or_403(request, db, user)
-    if end_date < start_date or db.scalar(select(Sprint.id).where(Sprint.project_id == project.id, Sprint.status.in_(["Planning", "Active"]))): raise HTTPException(400)
-    db.add(Sprint(project_id=project.id, name=name.strip(), goal=goal.strip() or None, start_date=start_date, end_date=end_date)); db.commit()
+    if end_date < start_date: raise HTTPException(400)
+    sprint = sprint_or_404(db, project.id, sprint_id) if sprint_id else None
+    if not sprint:
+        if db.scalar(select(Sprint.id).where(Sprint.project_id == project.id, Sprint.status.in_(["Planning", "Active"]))): raise HTTPException(400)
+        sprint = Sprint(project_id=project.id); db.add(sprint)
+    sprint.name, sprint.goal, sprint.start_date, sprint.end_date = name.strip(), goal.strip() or None, start_date, end_date
+    db.commit()
     return RedirectResponse("/sprint", status_code=303)
+
+
+@router.post("/sprint/{sprint_id}/delete", include_in_schema=False)
+def delete_sprint(request: Request, sprint_id: str, csrf: str = Form(), user: User = Depends(require_user), db: Session = Depends(get_db)):
+    validate_csrf(request, csrf); project = project_or_403(request, db, user); sprint = sprint_or_404(db, project.id, sprint_id)
+    db.delete(sprint); db.commit(); return RedirectResponse("/sprint", status_code=303)
 
 
 @router.post("/sprint/{sprint_id}/items", include_in_schema=False)

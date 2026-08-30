@@ -23,7 +23,7 @@ def context(request: Request, user: User, **values):
 @router.get("/settings/workspace", include_in_schema=False)
 def workspace_page(request: Request, user: User = Depends(require_user), db: Session = Depends(get_db)):
     workspaces = authorized_workspaces(db, user)
-    selected = get_workspace(db, user, request.session.get("workspace_id"))
+    selected = None if request.query_params.get("new") else get_workspace(db, user, request.query_params.get("edit_id") or request.session.get("workspace_id"))
     return templates.TemplateResponse(request, "workspace.html", context(request, user, page_title="Workspace", workspaces=workspaces, workspace=selected))
 
 
@@ -45,6 +45,14 @@ def save_workspace(request: Request, name: str = Form(), csrf: str = Form(), tim
     return RedirectResponse("/settings/workspace", status_code=303)
 
 
+@router.post("/settings/workspace/{workspace_id}/delete", include_in_schema=False)
+def delete_workspace(request: Request, workspace_id: str, csrf: str = Form(), user: User = Depends(require_user), db: Session = Depends(get_db)):
+    validate_csrf(request, csrf); workspace = get_workspace(db, user, workspace_id)
+    if not workspace or workspace.owner_user_id != user.id: raise HTTPException(403)
+    db.delete(workspace); db.commit(); request.session.pop("workspace_id", None); request.session.pop("project_id", None)
+    return RedirectResponse("/settings/workspace", status_code=303)
+
+
 @router.post("/settings/workspace/select", include_in_schema=False)
 def select_workspace(request: Request, workspace_id: str = Form(), csrf: str = Form(), user: User = Depends(require_user), db: Session = Depends(get_db)):
     validate_csrf(request, csrf)
@@ -60,7 +68,10 @@ def select_workspace(request: Request, workspace_id: str = Form(), csrf: str = F
 def projects_page(request: Request, user: User = Depends(require_user), db: Session = Depends(get_db)):
     workspace = get_workspace(db, user, request.session.get("workspace_id"))
     projects = db.scalars(select(Project).where(Project.workspace_id == workspace.id).order_by(Project.name)).all() if workspace else []
-    return templates.TemplateResponse(request, "projects.html", context(request, user, page_title="Projects", workspace=workspace, projects=projects))
+    editing = get_project(db, user, request.query_params.get("edit_id")) if request.query_params.get("edit_id") else None
+    if editing and (not workspace or editing.workspace_id != workspace.id):
+        editing = None
+    return templates.TemplateResponse(request, "projects.html", context(request, user, page_title="Projects", workspace=workspace, projects=projects, editing=editing))
 
 
 @router.post("/settings/projects", include_in_schema=False)
@@ -82,6 +93,17 @@ def save_project(request: Request, name: str = Form(), project_key: str = Form()
     return RedirectResponse("/settings/projects", status_code=303)
 
 
+@router.post("/settings/projects/{project_id}/delete", include_in_schema=False)
+def delete_project(request: Request, project_id: str, csrf: str = Form(), user: User = Depends(require_user), db: Session = Depends(get_db)):
+    validate_csrf(request, csrf); project = get_project(db, user, project_id)
+    if not project: raise HTTPException(403)
+    workspace = get_workspace(db, user, project.workspace_id)
+    if not workspace or workspace.owner_user_id != user.id: raise HTTPException(403)
+    db.delete(project); db.commit()
+    if request.session.get("project_id") == str(project.id): request.session.pop("project_id", None)
+    return RedirectResponse("/settings/projects", status_code=303)
+
+
 @router.post("/settings/projects/select", include_in_schema=False)
 def select_project(request: Request, project_id: str = Form(), csrf: str = Form(), user: User = Depends(require_user), db: Session = Depends(get_db)):
     validate_csrf(request, csrf)
@@ -96,7 +118,10 @@ def select_project(request: Request, project_id: str = Form(), csrf: str = Form(
 def team_page(request: Request, user: User = Depends(require_user), db: Session = Depends(get_db)):
     project = get_project(db, user, request.session.get("project_id"))
     members = db.scalars(select(TeamMember).where(TeamMember.project_id == project.id).order_by(TeamMember.display_name)).all() if project else []
-    return templates.TemplateResponse(request, "team.html", context(request, user, page_title="Team", project=project, members=members))
+    try: editing_id = uuid.UUID(request.query_params.get("edit_id")) if request.query_params.get("edit_id") else None
+    except ValueError: editing_id = None
+    editing = db.scalar(select(TeamMember).where(TeamMember.id == editing_id, TeamMember.project_id == project.id)) if project and editing_id else None
+    return templates.TemplateResponse(request, "team.html", context(request, user, page_title="Team", project=project, members=members, editing=editing))
 
 
 @router.post("/team", include_in_schema=False)
@@ -107,7 +132,10 @@ def save_team_member(request: Request, display_name: str = Form(), role: str = F
         raise HTTPException(403)
     member = None
     if member_id:
-        member = db.scalar(select(TeamMember).where(TeamMember.id == uuid.UUID(member_id), TeamMember.project_id == project.id))
+        try: value = uuid.UUID(member_id)
+        except ValueError: raise HTTPException(404)
+        member = db.scalar(select(TeamMember).where(TeamMember.id == value, TeamMember.project_id == project.id))
+        if not member: raise HTTPException(404)
     if not member:
         member = TeamMember(workspace_id=project.workspace_id, project_id=project.id)
         db.add(member)
@@ -116,3 +144,14 @@ def save_team_member(request: Request, display_name: str = Form(), role: str = F
     member.working_days, member.active = working_days or ["Mon", "Tue", "Wed", "Thu", "Fri"], active
     db.commit()
     return RedirectResponse("/team", status_code=303)
+
+
+@router.post("/team/{member_id}/delete", include_in_schema=False)
+def delete_team_member(request: Request, member_id: str, csrf: str = Form(), user: User = Depends(require_user), db: Session = Depends(get_db)):
+    validate_csrf(request, csrf); project = get_project(db, user, request.session.get("project_id"))
+    if not project: raise HTTPException(403)
+    try: value = uuid.UUID(member_id)
+    except ValueError: raise HTTPException(404)
+    member = db.scalar(select(TeamMember).where(TeamMember.id == value, TeamMember.project_id == project.id))
+    if not member: raise HTTPException(404)
+    db.delete(member); db.commit(); return RedirectResponse("/team", status_code=303)

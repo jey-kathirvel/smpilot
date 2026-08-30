@@ -3,13 +3,14 @@ import uuid
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import or_, select
+from sqlalchemy import delete, or_, select
 from sqlalchemy.orm import Session
 
 from app.auth.dependencies import csrf_token, require_user, validate_csrf
 from app.database import get_db
 from app.models.backlog import BACKLOG_STATUSES, DEPENDENCY_TYPES, PRIORITIES, WORK_ITEM_TYPES, WorkItem, WorkItemDependency
 from app.models.organization import TeamMember
+from app.models.sprint import SprintItem
 from app.models.user import User
 from app.services.authorization import get_project
 from app.services.backlog import next_item_key, readiness_warnings
@@ -72,15 +73,21 @@ def item_detail(request: Request, item_id: str, dependency_error: str = "", user
     targets = db.scalars(select(WorkItem).where(WorkItem.project_id == project.id, WorkItem.id != item.id, WorkItem.archived.is_(False))).all()
     dependencies = db.execute(select(WorkItemDependency, WorkItem).join(WorkItem, WorkItem.id == WorkItemDependency.target_item_id).where(WorkItemDependency.source_item_id == item.id)).all()
     error_message = "Select a valid target backlog item." if dependency_error else ""
-    return templates.TemplateResponse(request, "work_item.html", {"page_title": item.item_key, "show_nav": True, "user": user, "csrf_token": csrf_token(request), "project": project, "item": item, "team": team, "targets": targets, "dependencies": dependencies, "dependency_error": error_message, "warnings": readiness_warnings(db, item), "types": WORK_ITEM_TYPES, "statuses": BACKLOG_STATUSES, "priorities": PRIORITIES, "relations": DEPENDENCY_TYPES})
+    epics = db.scalars(select(WorkItem).where(WorkItem.project_id == project.id, WorkItem.type == "Epic", WorkItem.id != item.id, WorkItem.archived.is_(False))).all()
+    return templates.TemplateResponse(request, "work_item.html", {"page_title": item.item_key, "show_nav": True, "user": user, "csrf_token": csrf_token(request), "project": project, "item": item, "team": team, "targets": targets, "epics": epics, "dependencies": dependencies, "dependency_error": error_message, "warnings": readiness_warnings(db, item), "types": WORK_ITEM_TYPES, "statuses": BACKLOG_STATUSES, "priorities": PRIORITIES, "relations": DEPENDENCY_TYPES})
 
 
 @router.post("/backlog/{item_id}", include_in_schema=False)
-def update_item(request: Request, item_id: str, title: str = Form(), item_type: str = Form(alias="type"), priority: str = Form(), status_value: str = Form(alias="status"), csrf: str = Form(), description: str = Form(default=""), acceptance_criteria: str = Form(default=""), story_points: str = Form(default=""), assignee_id: str = Form(default=""), user: User = Depends(require_user), db: Session = Depends(get_db)):
+def update_item(request: Request, item_id: str, title: str = Form(), item_type: str = Form(alias="type"), priority: str = Form(), status_value: str = Form(alias="status"), csrf: str = Form(), description: str = Form(default=""), acceptance_criteria: str = Form(default=""), story_points: str = Form(default=""), assignee_id: str = Form(default=""), epic_id: str = Form(default=""), user: User = Depends(require_user), db: Session = Depends(get_db)):
     validate_csrf(request, csrf); project = project_or_403(request, db, user); item = owned_item(db, project.id, item_id)
+    if item_type not in WORK_ITEM_TYPES or priority not in PRIORITIES or status_value not in BACKLOG_STATUSES:
+        raise HTTPException(400)
+    epic = owned_item(db, project.id, epic_id) if epic_id and item_type != "Epic" else None
+    if epic and epic.type != "Epic": raise HTTPException(400)
     item.title, item.type, item.priority, item.status = title.strip(), item_type, priority, status_value
     item.description, item.acceptance_criteria = description.strip() or None, acceptance_criteria.strip() or None
     item.story_points, item.assignee_id = int(story_points) if story_points else None, uuid.UUID(assignee_id) if assignee_id else None
+    item.epic_id = epic.id if epic else None
     db.commit(); return RedirectResponse(f"/backlog/{item.id}", status_code=303)
 
 
@@ -104,4 +111,11 @@ def add_dependency(request: Request, item_id: str, csrf: str = Form(), target_it
 @router.post("/backlog/{item_id}/archive", include_in_schema=False)
 def archive_item(request: Request, item_id: str, csrf: str = Form(), user: User = Depends(require_user), db: Session = Depends(get_db)):
     validate_csrf(request, csrf); project = project_or_403(request, db, user); item = owned_item(db, project.id, item_id); item.archived = True; db.commit()
+    return RedirectResponse("/backlog", status_code=303)
+
+
+@router.post("/backlog/{item_id}/delete", include_in_schema=False)
+def delete_item(request: Request, item_id: str, csrf: str = Form(), user: User = Depends(require_user), db: Session = Depends(get_db)):
+    validate_csrf(request, csrf); project = project_or_403(request, db, user); item = owned_item(db, project.id, item_id)
+    db.execute(delete(SprintItem).where(SprintItem.work_item_id == item.id)); db.delete(item); db.commit()
     return RedirectResponse("/backlog", status_code=303)
