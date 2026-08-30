@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0b7798">
+  <meta name="theme-color" content="#07384c">
   <meta name="description" content="SMPilot AI — your AI Scrum Master for focused, healthier sprints.">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -12,7 +12,7 @@
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" href="/static/icons/icon-192.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/static/icons/icon-192.svg">
-  <link rel="stylesheet" href="{{ url_for('static', path='/css/app.css') }}?v=workspace-limits-1">
+  <link rel="stylesheet" href="{{ url_for('static', path='/css/app.css') }}?v=coastal-executive-1">
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to content</a>
@@ -32,6 +32,6 @@
   </main>
   {% if show_nav and user %}<button class="aria-chat-launcher" type="button" aria-expanded="false" aria-controls="aria-chat-panel"><span class="aria-launcher-mark" aria-hidden="true">A</span><span>Ask Aria</span></button><aside id="aria-chat-panel" class="aria-chat-drawer" aria-label="Ask Aria" data-clear-url="/aria/clear" data-csrf="{{ csrf_token }}" hidden><header><div><strong>Ask Aria</strong><small>Your AI Scrum Master</small></div><button class="aria-chat-close" type="button" aria-label="Close Aria chat">×</button></header><iframe title="Ask Aria chatbot" data-src="/aria?embed=1"></iframe></aside>{% endif %}
   <aside class="pwa-install-help" role="dialog" aria-modal="true" aria-labelledby="pwa-install-title" hidden><div><button class="pwa-help-close" type="button" aria-label="Close installation instructions">×</button><span class="brand-mark" aria-hidden="true">S</span><h2 id="pwa-install-title">Install SMPilot</h2><p class="pwa-ios-copy" hidden>In Safari, tap <strong>Share</strong>, then choose <strong>Add to Home Screen</strong>.</p><p class="pwa-browser-copy">Open your browser menu and choose <strong>Install app</strong> or <strong>Add to Home screen</strong>.</p><button class="pwa-help-done" type="button">Got it</button></div></aside>
-  <script src="{{ url_for('static', path='/js/app.js') }}?v=workspace-limits-1" defer></script>
+  <script src="{{ url_for('static', path='/js/app.js') }}?v=coastal-executive-1" defer></script>
 </body>
 </html>
