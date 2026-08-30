@@ -3,7 +3,7 @@ import uuid
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.auth.dependencies import csrf_token, require_user, validate_csrf
@@ -14,6 +14,8 @@ from app.services.authorization import authorized_workspaces, get_project, get_w
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
+MAX_WORKSPACES_PER_USER = 5
+MAX_PROJECTS_PER_WORKSPACE = 5
 
 
 def context(request: Request, user: User, **values):
@@ -23,8 +25,9 @@ def context(request: Request, user: User, **values):
 @router.get("/settings/workspace", include_in_schema=False)
 def workspace_page(request: Request, user: User = Depends(require_user), db: Session = Depends(get_db)):
     workspaces = authorized_workspaces(db, user)
+    owned_count = db.scalar(select(func.count(Workspace.id)).where(Workspace.owner_user_id == user.id)) or 0
     selected = None if request.query_params.get("new") else get_workspace(db, user, request.query_params.get("edit_id") or request.session.get("workspace_id"))
-    return templates.TemplateResponse(request, "workspace.html", context(request, user, page_title="Workspace", workspaces=workspaces, workspace=selected))
+    return templates.TemplateResponse(request, "workspace.html", context(request, user, page_title="Workspace", workspaces=workspaces, workspace=selected, owned_count=owned_count, workspace_limit=MAX_WORKSPACES_PER_USER, can_create=owned_count < MAX_WORKSPACES_PER_USER, limit_reached=bool(request.query_params.get("limit"))))
 
 
 @router.post("/settings/workspace", include_in_schema=False)
@@ -36,6 +39,9 @@ def save_workspace(request: Request, name: str = Form(), csrf: str = Form(), tim
             raise HTTPException(403)
         workspace.name, workspace.timezone = name.strip(), timezone.strip() or "UTC"
     else:
+        owned_count = db.scalar(select(func.count(Workspace.id)).where(Workspace.owner_user_id == user.id)) or 0
+        if owned_count >= MAX_WORKSPACES_PER_USER:
+            return RedirectResponse("/settings/workspace?new=1&limit=1", status_code=303)
         workspace = Workspace(name=name.strip(), timezone=timezone.strip() or "UTC", owner_user_id=user.id)
         db.add(workspace)
         db.flush()
@@ -71,7 +77,8 @@ def projects_page(request: Request, user: User = Depends(require_user), db: Sess
     editing = get_project(db, user, request.query_params.get("edit_id")) if request.query_params.get("edit_id") else None
     if editing and (not workspace or editing.workspace_id != workspace.id):
         editing = None
-    return templates.TemplateResponse(request, "projects.html", context(request, user, page_title="Projects", workspace=workspace, projects=projects, editing=editing))
+    project_count = len(projects)
+    return templates.TemplateResponse(request, "projects.html", context(request, user, page_title="Projects", workspace=workspace, projects=projects, editing=editing, project_count=project_count, project_limit=MAX_PROJECTS_PER_WORKSPACE, can_create=project_count < MAX_PROJECTS_PER_WORKSPACE, limit_reached=bool(request.query_params.get("limit"))))
 
 
 @router.post("/settings/projects", include_in_schema=False)
@@ -84,6 +91,9 @@ def save_project(request: Request, name: str = Form(), project_key: str = Form()
     if project and project.workspace_id != workspace.id:
         raise HTTPException(403)
     if not project:
+        project_count = db.scalar(select(func.count(Project.id)).where(Project.workspace_id == workspace.id)) or 0
+        if project_count >= MAX_PROJECTS_PER_WORKSPACE:
+            return RedirectResponse("/settings/projects?limit=1", status_code=303)
         project = Project(workspace_id=workspace.id)
         db.add(project)
     project.name, project.project_key = name.strip(), project_key.strip().upper()
