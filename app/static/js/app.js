@@ -7,6 +7,72 @@ document.querySelectorAll('form[data-confirm]').forEach((form) => {
   });
 });
 
+const fieldHelp = {
+  acceptance_criteria: 'Define the observable conditions that must be true for this work to be accepted as complete.',
+  assignee_id: 'Choose the team member currently responsible for moving this work forward.',
+  blockers: 'Describe anything preventing progress, including the decision or support needed to unblock it.',
+  capacity_hours_per_day: 'Enter the realistic number of hours available for project work on a normal working day.',
+  category: 'Group the retrospective observation so recurring improvement themes are easier to identify.',
+  confidence: 'Estimate confidence in completing the planned work; lower confidence helps surface risk early.',
+  confirm_password: 'Repeat the new password exactly to prevent an accidental password change.',
+  content: 'Capture one specific observation so the team can discuss and act on it.',
+  current_password: 'Enter your existing password to authorize this security-sensitive change.',
+  decision: 'Record the decision the team has agreed to follow.',
+  description: 'Add the context, expected outcome, and constraints someone needs to understand this item.',
+  display_name: 'Use the name teammates will recognize in assignments, stand-ups, and reports.',
+  due_date: 'Choose a realistic date for reviewing or completing this improvement action.',
+  email: 'Use the email address associated with this SMPilot account.',
+  end_date: 'Set the final calendar day of the sprint; this drives progress and health calculations.',
+  epic_id: 'Link this item to the larger epic whose outcome it contributes to.',
+  full_name: 'Enter the name teammates should see throughout the workspace.',
+  goal: 'State the single outcome the sprint should achieve, not a list of every task.',
+  mobile: 'Add a reachable contact number, including the country code when appropriate.',
+  name: 'Use a short, clear name that teammates can identify quickly.',
+  organization_name: 'Enter the organization or team this account represents.',
+  owner: 'Name the person responsible for following through and reporting progress.',
+  password: 'Use a strong, unique password that you do not reuse on another service.',
+  priority: 'Set priority by delivery impact and urgency, not by who requested the work.',
+  project_key: 'Use a short unique code; it becomes the prefix for backlog item IDs.',
+  question: 'Ask one focused question and include the project context Aria needs to answer well.',
+  relation_type: 'Describe how the selected work items affect or depend on each other.',
+  reset_code: 'Enter the time-limited verification code sent during password recovery.',
+  result: 'Summarize the outcome produced after the decision was applied.',
+  role: 'Select the member’s primary collaboration role; this is not a performance rating.',
+  sprint_goal: 'Describe the valuable outcome this proposed sprint should deliver.',
+  start_date: 'Set the first calendar day of the sprint; reporting begins from this date.',
+  status: 'Choose the state that accurately reflects where the work is now.',
+  story_points: 'Estimate relative effort, complexity, and uncertainty—not elapsed hours.',
+  target_item_id: 'Select the backlog item affected by this dependency relationship.',
+  timezone: 'Choose the timezone used to determine daily updates, dates, and reporting boundaries.',
+  title: 'Write a concise, outcome-focused title that is easy to scan in the backlog.',
+  today: 'State the most important work planned for today and the intended outcome.',
+  type: 'Choose the work-item type that best represents the scope and purpose of this item.',
+  unfinished_action: 'Choose whether incomplete sprint work returns to the backlog or keeps its current status.',
+  yesterday: 'Summarize completed progress since the previous stand-up; keep it brief and factual.'
+};
+
+let fieldHelpIndex = 0;
+document.querySelectorAll('label input[name], label textarea[name], label select[name]').forEach((control) => {
+  if (!fieldHelp[control.name] || ['hidden', 'checkbox', 'radio'].includes(control.type)) return;
+  const label = control.closest('label');
+  if (!label || label.classList.contains('has-field-help')) return;
+  const id = `field-help-${++fieldHelpIndex}`;
+  const button = document.createElement('button');
+  button.type = 'button'; button.className = 'field-help'; button.textContent = '?';
+  button.setAttribute('aria-label', `Help for ${control.name.replaceAll('_', ' ')}`);
+  button.setAttribute('aria-describedby', id); button.setAttribute('aria-expanded', 'false');
+  const help = document.createElement('span');
+  help.id = id; help.className = 'field-help-text'; help.setAttribute('role', 'tooltip'); help.textContent = fieldHelp[control.name];
+  button.addEventListener('click', (event) => {
+    event.preventDefault(); event.stopPropagation();
+    const opening = button.getAttribute('aria-expanded') !== 'true';
+    document.querySelectorAll('.field-help[aria-expanded="true"]').forEach((item) => item.setAttribute('aria-expanded', 'false'));
+    button.setAttribute('aria-expanded', String(opening));
+  });
+  label.classList.add('has-field-help'); label.append(button, help);
+});
+document.addEventListener('click', () => document.querySelectorAll('.field-help[aria-expanded="true"]').forEach((item) => item.setAttribute('aria-expanded', 'false')));
+
 if (navToggle && primaryNav) {
   navToggle.addEventListener('click', () => {
     const isOpen = navToggle.getAttribute('aria-expanded') === 'true';
