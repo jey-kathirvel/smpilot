@@ -53,6 +53,11 @@ const fieldHelp = {
 
 let fieldHelpIndex = 0;
 const firstStandupMember = document.querySelector('.team-standup-list .standup-member');
+const standupMembers = document.querySelectorAll('.team-standup-list .standup-member');
+standupMembers.forEach((member) => member.addEventListener('toggle', () => {
+  if (!member.open) return;
+  standupMembers.forEach((other) => { if (other !== member) other.open = false; });
+}));
 document.querySelectorAll('label input[name], label textarea[name], label select[name]').forEach((control) => {
   if (!fieldHelp[control.name] || ['hidden', 'checkbox', 'radio'].includes(control.type)) return;
   const standupMember = control.closest('.standup-member');
