@@ -10,6 +10,7 @@ from sqlalchemy.orm import Session
 from app.auth.dependencies import csrf_token, require_user, validate_csrf
 from app.database import get_db
 from app.models.backlog import BACKLOG_STATUSES, WorkItem
+from app.models.retro import RetroFeedback
 from app.models.sprint import Sprint, SprintItem
 from app.models.user import User
 from app.services.authorization import get_project
@@ -102,8 +103,11 @@ def update_sprint_item(request: Request, sprint_id: str, item_id: str, status_va
 def complete_sprint(request: Request, sprint_id: str, csrf: str = Form(), unfinished_action: str = Form(default="backlog"), user: User = Depends(require_user), db: Session = Depends(get_db)):
     validate_csrf(request, csrf); project = project_or_403(request, db, user); sprint = sprint_or_404(db, project.id, sprint_id)
     if sprint.status != "Active": raise HTTPException(400)
+    if unfinished_action not in {"backlog", "preserve"}: raise HTTPException(400, "Invalid unfinished work action")
+    if not db.scalar(select(RetroFeedback.id).where(RetroFeedback.sprint_id == sprint.id)):
+        return RedirectResponse(f"/sprints/{sprint.id}/retro?required=1", status_code=303)
     rows = db.execute(select(SprintItem, WorkItem).join(WorkItem, WorkItem.id == SprintItem.work_item_id).where(SprintItem.sprint_id == sprint.id, SprintItem.removed_at.is_(None))).all()
     for membership,item in rows:
         membership.final_status = item.status
         if item.status != "Done" and unfinished_action == "backlog": item.status = "Backlog"
-    recalculate_sprint(db, sprint); sprint.status = "Completed"; db.commit(); return RedirectResponse("/sprint", status_code=303)
+    recalculate_sprint(db, sprint); sprint.status = "Completed"; db.commit(); return RedirectResponse(f"/sprints/{sprint.id}/review", status_code=303)

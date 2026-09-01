@@ -27,7 +27,7 @@ def review(request:Request,sprint_id:str,user:User=Depends(require_user),db:Sess
 @router.get("/sprints/{sprint_id}/retro",include_in_schema=False)
 def retro(request:Request,sprint_id:str,user:User=Depends(require_user),db:Session=Depends(get_db)):
     sprint=sprint_scope(request,db,user,sprint_id); feedback=db.scalars(select(RetroFeedback).where(RetroFeedback.sprint_id==sprint.id)).all(); actions=db.scalars(select(RetroAction).where(RetroAction.source_sprint_id==sprint.id)).all()
-    return templates.TemplateResponse(request,"retro.html",{"page_title":"Aria Retro","show_nav":True,"user":user,"csrf_token":csrf_token(request),"sprint":sprint,"feedback":feedback,"actions":actions})
+    return templates.TemplateResponse(request,"retro.html",{"page_title":"Team Retrospective","show_nav":True,"user":user,"csrf_token":csrf_token(request),"sprint":sprint,"feedback":feedback,"actions":actions,"can_complete":bool(feedback),"required":bool(request.query_params.get("required"))})
 @router.post("/sprints/{sprint_id}/retro",include_in_schema=False)
 def add_feedback(request:Request,sprint_id:str,category:str=Form(),content:str=Form(),csrf:str=Form(),user:User=Depends(require_user),db:Session=Depends(get_db)):
     validate_csrf(request,csrf); sprint=sprint_scope(request,db,user,sprint_id)
